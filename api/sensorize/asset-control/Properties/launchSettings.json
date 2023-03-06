@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "asset_control": {
+    "sensorize": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
