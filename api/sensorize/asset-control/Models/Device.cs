@@ -1,4 +1,4 @@
-﻿using AssetControl.Api.Models.Enum;
+﻿using Sensorize.Domain.Enums;
 
 namespace AssetControl.Api.Models
 {

@@ -1,8 +1,7 @@
 ﻿using AssetControl.Api.Models;
-using AssetControl.Api.Models.Enum;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using System.Net;
+using Sensorize.Domain.Enums;
 using System.Text.Json;
 
 namespace AssetControl.Api.Controllers

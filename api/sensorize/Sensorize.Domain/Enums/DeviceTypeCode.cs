@@ -1,4 +1,4 @@
-﻿namespace AssetControl.Api.Models.Enum
+﻿namespace Sensorize.Domain.Enums
 {
     public enum DeviceTypeCode
     {

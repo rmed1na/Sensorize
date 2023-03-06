@@ -1,7 +1,14 @@
 using AssetControl.Api.EventListeners;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Sensorize.Api;
+using Sensorize.Api.Models.AppSettings;
+using Sensorize.Repository.Context;
 
 var builder = WebApplication.CreateBuilder(args);
+var appSettings = builder.Configuration
+    .GetSection("Application")
+    .Get<ApiSettings>();
 
 // Add services to the container.
 builder.Services.AddSignalR();
@@ -10,6 +17,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
+
+// Database
+builder.Services.AddDbContext<SensorizeContext>(options =>
+{
+    options.UseMySQL(appSettings.DataSource.BuildMySqlConnectionString());
+}, ServiceLifetime.Transient);
+
+DependencyInjection.Configure(builder.Services);
 
 var app = builder.Build();
 
