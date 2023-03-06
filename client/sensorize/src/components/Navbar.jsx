@@ -1,18 +1,31 @@
-import './Navbar.scss'
+import { Link as RouterLink } from 'react-router-dom';
 
-export default function Navbar() {
+// Chakra
+import { Icon, Box, Flex, useColorModeValue, Button, Link, Heading } from '@chakra-ui/react';
+
+// Icons
+import { RiLogoutCircleRLine } from 'react-icons/ri';
+
+export default function Navbar({
+    title
+}) {
     return (
-        <div className='navbar'>
-            <div className='navbar__logo'>
-                <i className="fa-brands fa-watchman-monitoring"></i>
-                <span>Asset Control</span>
-            </div>
-            <div className='navbar__exit'>
-                <a href="/login">
-                    <span>Salir</span>
-                    <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
-            </div>
-        </div>
+        <>
+            <Flex 
+                w="100%" 
+                h="3rem"
+                borderBottom="1px"
+                borderBottomColor={useColorModeValue('gray.300', 'gray.700')}
+                align="center"
+                justify="space-between"
+                px={5}>
+                    <Heading as="h3" color="brand.700">{title}</Heading>
+                    <Link as={RouterLink} to='/login'>
+                        <Box display="flex" alignItems="center">
+                            <Icon as={RiLogoutCircleRLine} boxSize={5} color={useColorModeValue('brand.600')} />
+                        </Box>
+                    </Link>
+            </Flex>
+        </>
     )
 }

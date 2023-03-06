@@ -1,14 +1,11 @@
-import { useState } from 'react'
-import './App.css'
-import Login from './components/Auth/Login'
+import { Box } from '@chakra-ui/react'
+import Login from './pages/auth/Login'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="App">
+    <Box minW="100vw" minH="100vh">
       <Login />
-    </div>
+    </Box>
   )
 }
 

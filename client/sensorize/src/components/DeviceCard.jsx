@@ -1,4 +1,12 @@
-import './DeviceCard.scss'
+import {
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Heading,
+    Text,
+    Box
+} from '@chakra-ui/react';
 
 export default function DeviceCard({
     name,
@@ -10,20 +18,18 @@ export default function DeviceCard({
     let alertClass = isOnAlert == true ? "card--alert" : "";
 
     return (
-        <div className={`card ${alertClass}`}>
-            <div className='card__info'>
-                <div className='card__info--text'>
-                    <h4>{name}</h4>
-                    <label>Últ. actualización: </label>
-                    <label>{lastUpdate ? lastUpdate : `-`}</label>
-                </div>
-                <div className='card__info--icon'>
-                    <i className={iconClassName}></i>
-                </div>
-            </div>
-            <div className='card__state'>
-                <label>{stateDescription}</label>
-            </div>
-        </div>
+        <>
+            <Card maxW="sm">
+                <CardHeader pb={0} color="brand.700">
+                    <Heading as="h4">{name}</Heading>
+                </CardHeader>
+                <CardBody py={2}>
+                    <Text fontSize="0.8125rem">Última actualización: {lastUpdate ? lastUpdate : '-'}</Text>
+                </CardBody>
+                <CardFooter borderBottomRadius="md" bg="blackAlpha.100" py={3} fontWeight={500} color="blackAlpha.700">
+                    <Text>{stateDescription}</Text>
+                </CardFooter>
+            </Card>
+        </>
     )
 }

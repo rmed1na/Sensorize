@@ -9,16 +9,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
+    "@chakra-ui/icons": "^2.0.17",
+    "@chakra-ui/react": "^2.5.1",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
     "@fontsource/inter": "^4.5.14",
     "@fontsource/noto-sans": "^4.5.11",
     "@fontsource/raleway": "^4.5.11",
     "@fontsource/roboto": "^4.5.8",
+    "@fontsource/rubik": "^4.5.14",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@mui/material": "^5.11.8",
+    "framer-motion": "^10.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.8.0",
     "react-router-dom": "^6.5.0"
   },
   "devDependencies": {
