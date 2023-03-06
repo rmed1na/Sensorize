@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetControl.Api", "asset-control\AssetControl.Api.csproj", "{9169AA42-7E97-46BD-9842-54C4EC8164BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sensorize.Api", "asset-control\Sensorize.Api.csproj", "{9169AA42-7E97-46BD-9842-54C4EC8164BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
