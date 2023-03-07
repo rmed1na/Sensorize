@@ -1,3 +1,6 @@
+// React
+import { useState } from 'react';
+
 // Chakra
 import { 
     Box, 
@@ -7,16 +10,17 @@ import {
     useColorModeValue } from '@chakra-ui/react';
 
 // Icons
-import { VscRadioTower } from 'react-icons/vsc';
 import { BiChip } from 'react-icons/bi';
 import { RxDashboard } from 'react-icons/rx';
+import { 
+    MdDeviceThermostat
+} from 'react-icons/md';
 
 // CC
-import NavItem from './SidebarItem';
-import { useState } from 'react';
+import SideBarItem from './SideBarItem';
 
-export default function Sidebar() {
-    const [navItems, setNavItems] = useState([
+export default function SideBar() {
+    const [navItems] = useState([
         {
             title: 'Monitoreo',
             to: '/home',
@@ -24,8 +28,19 @@ export default function Sidebar() {
         },
         {
             title: 'Dispositivos',
-            to: '/device',
-            icon: BiChip
+            icon: BiChip,
+            children: [
+                {
+                    title: 'Dispositivos',
+                    icon: BiChip,
+                    to: '/device'
+                },
+                {
+                    title: 'Tipo',
+                    icon: MdDeviceThermostat,
+                    to: '/device/type'
+                }
+            ]
         }
     ]);
 
@@ -48,11 +63,12 @@ export default function Sidebar() {
 
                     <Stack mx="0.25rem">
                         {navItems.map((i) => {
-                            return <NavItem 
-                                        key={i.title} 
+                            return <SideBarItem
+                                        key={i.title}
                                         title={i.title} 
                                         to={i.to} 
-                                        icon={i.icon} />
+                                        icon={i.icon}
+                                        children={i.children} />
                         })}
                     </Stack>
                 </Flex>

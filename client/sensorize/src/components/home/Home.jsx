@@ -1,13 +1,15 @@
+// React
 import { useState, useEffect, useRef } from 'react';
-import Navbar from '../Navbar'
-import DeviceCard from '../DeviceCard'
+
 // Chakra
 import { 
     Box, 
     Flex } from '@chakra-ui/react';
+
 // CC
-import Sidebar from '../sidebar/Sidebar';
+import SideBar from '../sidebar/SideBar';
 import Dashboard from '../../pages/dashboard/Dashboard';
+import Navbar from '../Navbar'
 
 export default function Home() {
     const baseApiUrl = 'https://localhost:7168/api';
@@ -115,7 +117,7 @@ export default function Home() {
     return (
         <Box>
             <Flex h="100vh">
-                <Sidebar />
+                <SideBar />
                 <Flex flexGrow="1" direction="column">
                     <Navbar />
                     <Dashboard title="Dashboard" />

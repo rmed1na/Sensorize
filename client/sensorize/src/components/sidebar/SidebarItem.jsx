@@ -4,35 +4,73 @@ import {
     Link,
     Icon,
     Text,
-    useColorModeValue } from "@chakra-ui/react";
+    useColorModeValue,
+    Accordion,
+    AccordionItem,
+    AccordionButton,
+    AccordionPanel,
+    AccordionIcon
+} from "@chakra-ui/react";
 
-export default function NavItem({
+export default function SideBarItem({
     title,
     icon,
-    to
+    to,
+    children = []
 }) {
     const location = useLocation();
-    const isSelected = location.pathname === to;
-    
-    return (
-        <Link 
+
+    function getSideBarLink(route, titleText, linkIcon, isSelected) {
+        return (
+        <Link
+            key={titleText}
             as={RouterLink}
-            to={to}
+            to={route}
             transition="all 0.2s"
-            style={{ textDecoration: 'none' }}
-            borderRadius="sm"
-            bg={isSelected ? 'brand.600' : 'inherit'}
-            _hover={{ bg: useColorModeValue('brand.100')}}>
+            borderRadius="md"
+            style={{ textDecoration: 'none' }}>
             <Flex
                 align="center"
                 p={2}
                 cursor="pointer"
                 gap={2}
                 color={isSelected ? '#fff' : 'blackAlpha.700'}
-                _hover={{ color: (isSelected ? useColorModeValue('brand.700') : 'inherit') }}>
-                {icon && (<Icon as={icon} />)}
-                <Text fontSize="0.875rem" fontWeight={500}>{title}</Text>
+                bg={isSelected ? 'brand.600' : 'inherit'}
+                borderRadius="md"
+                _hover={{ color: (isSelected ? useColorModeValue('brand.700') : 'inherit'), bg: useColorModeValue('brand.100') }}>
+                {linkIcon && (<Icon as={linkIcon} />)}
+                <Text fontSize="0.875rem" fontWeight={500}>{titleText}</Text>
             </Flex>
-        </Link>
-    )
+        </Link>)
+    }
+    
+    if (children.length <= 0) {
+        return getSideBarLink(to, title, icon, location.pathname == to);
+    }
+
+    let anyChildrenSelected = children.findIndex(c => location.pathname == c.to) > -1;
+
+    return (
+        <Accordion 
+            allowToggle
+            transition="all 0.2s"
+            defaultIndex={anyChildrenSelected ? [0] : null}>
+            <AccordionItem 
+                border="none"
+                borderRadius="sm">
+                <AccordionButton color="blackAlpha.700" p={2}>
+                    {icon && (<Icon as={icon} />)}
+                    <Flex justify="space-between" w="100%">
+                        <Text ml={2} fontSize="0.875rem" fontWeight={500}>{title}</Text>
+                        <AccordionIcon />
+                    </Flex>
+                </AccordionButton>
+                <AccordionPanel>
+                    {children.map(c => {
+                        return getSideBarLink(c.to, c.title, c.icon, location.pathname == c.to)
+                    })}
+                </AccordionPanel>
+            </AccordionItem>
+        </Accordion>
+    );
 }

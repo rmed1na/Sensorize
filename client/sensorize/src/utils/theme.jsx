@@ -46,6 +46,11 @@ let components = {
         baseStyle: {
             fontWeight: '400'
         }
+    },
+    Heading: {
+        baseStyle: {
+            color: 'brand.700'
+        }
     }
 }
 

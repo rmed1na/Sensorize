@@ -31,6 +31,7 @@ import theme from './utils/theme'
 import App from './App'
 import Home from './components/home/Home'
 import DeviceConfig from './pages/devices/DeviceList'
+import DeviceType from './pages/devices/DeviceType';
 
 // CSS
 import './index.css'
@@ -43,7 +44,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path='/' element={<App />} />
           <Route path='/login' element={<App />} />
           <Route path='/home' element={<Home />} />
-          <Route path='/device' element={<DeviceConfig />}/>
+          <Route path='/device' element={<DeviceConfig />} />
+          <Route path='/device/type' element={<DeviceType />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

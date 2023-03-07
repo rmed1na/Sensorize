@@ -1,17 +1,18 @@
 import { Box, Container, Flex } from "@chakra-ui/react";
 import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/sidebar/Sidebar";
+import SideBar from "../../components/sidebar/SideBar";
 
 export default function DeviceConfig() {
     return (
         <Box>
             <Flex h="100vh">
-                <Sidebar />
+                <SideBar />
                 <Flex flexGrow={1} direction="column">
                     <Navbar title="Dispositivos"/>
-                    <Box mx={10} mt={5}>
-                        
-                    </Box>
+                    <Flex direction="row" mx={10} mt={5}>
+                        <Box>List of devices</Box>
+                        <Box>details</Box>
+                    </Flex>
                 </Flex>
             </Flex>
         </Box>
