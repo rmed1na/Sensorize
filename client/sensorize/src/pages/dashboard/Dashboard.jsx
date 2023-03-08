@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 
 // CC
-import DeviceCard from '../../components/DeviceCard';
+import DeviceCard from '../../components/device/DeviceCard';
 
 // Icons
 import { BiChip } from 'react-icons/bi';

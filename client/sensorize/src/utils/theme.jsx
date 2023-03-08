@@ -9,16 +9,16 @@ let fonts = {
 // Colors
 let colors = {
     brand: {
-      50: '#e8f4fc',
-      100: '#cfdce2',
-      200: '#b4c3cb',
-      300: '#97abb5',
-      400: '#7b939f',
-      500: '#617a85',
-      600: '#4b5f68',
-      700: '#34444b',
-      800: '#1c292f',
-      900: '#001014',
+        50: '#e8f4fc',
+        100: '#cfdce2',
+        200: '#b4c3cb',
+        300: '#97abb5',
+        400: '#7b939f',
+        500: '#617a85',
+        600: '#4b5f68',
+        700: '#34444b',
+        800: '#1c292f',
+        900: '#001014',
     }
 };
 
@@ -44,7 +44,8 @@ let components = {
     },
     Button: {
         baseStyle: {
-            fontWeight: '400'
+            fontWeight: '400',
+            boxShadow: 'md'
         }
     },
     Heading: {
@@ -58,10 +59,10 @@ const theme = extendTheme({
     fonts: fonts,
     colors: colors,
     components: components
-}, withDefaultColorScheme({ 
+}, withDefaultColorScheme({
     colorScheme: 'brand',
     components: ['Button', 'Heading', 'InputLeftAddon']
- }));
+}));
 
 console.log('theme', theme);
 export default theme;

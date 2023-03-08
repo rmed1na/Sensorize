@@ -11,7 +11,7 @@ input::-webkit-input-placeholder {
   box-sizing: border-box;
 }
 
-/* Overrides chakra sizing logic. Removes the need to add size to every heading and enforces to use semantics ("as" prop) on Chakra */
+/* Overrides chakra sizing logic. Removes the need to add size to every heading and enforces to use html semantics ("as" prop) on Chakra */
 h1 { font-size: 2rem !important; }
 h2 { font-size: 1.5rem !important; }
 h3 { font-size: 1.125rem !important; }

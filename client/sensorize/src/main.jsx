@@ -31,10 +31,11 @@ import theme from './utils/theme'
 import App from './App'
 import Home from './components/home/Home'
 import DeviceConfig from './pages/devices/DeviceList'
-import DeviceType from './pages/devices/DeviceType';
+import DeviceType from './pages/devices/type/DeviceType';
 
 // CSS
 import './index.css'
+import './scrollbar.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
