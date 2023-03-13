@@ -29,7 +29,7 @@ import '@fontsource/rubik/900.css'
 // CC
 import theme from './utils/theme'
 import App from './App'
-import Home from './components/home/Home'
+import Home from './pages/home/Home'
 import DeviceConfig from './pages/devices/DeviceList'
 import DeviceType from './pages/devices/type/DeviceType';
 

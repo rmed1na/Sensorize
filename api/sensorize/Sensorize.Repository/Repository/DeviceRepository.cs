@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Sensorize.Domain.Enums;
 using Sensorize.Domain.Models;
 using Sensorize.Repository.Context;
 
@@ -21,7 +22,9 @@ namespace Sensorize.Repository.Repository
 
         public async Task<ICollection<Device>> GetAllAsync()
         {
-            return await _ctx.Devices.ToListAsync();
+            return await _ctx.Devices
+                .Where(x => x.StatusCode == GlobalStatusCode.Active)
+                .ToListAsync();
         }
 
         public async Task SaveAsync(Device device)

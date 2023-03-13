@@ -1,8 +1,8 @@
+// React
+import { useState, useEffect } from 'react';
 // Chakra
 import { 
     Box, 
-    HStack, 
-    StackDivider, 
     Flex,
     Icon,
     Heading,
@@ -10,16 +10,26 @@ import {
     Divider,
     SimpleGrid
 } from "@chakra-ui/react";
-
-// CC
-import DeviceCard from '../../components/device/DeviceCard';
-
 // Icons
 import { BiChip } from 'react-icons/bi';
 import { CgDanger } from 'react-icons/cg';
 import { MdOutlineSync } from 'react-icons/md';
+// CC
+import DeviceCard from '../device/DeviceCard';
+import api from '../../api/api';
 
 export default function Dashboard() {
+    const [devices, setDevices] = useState([]);
+
+    async function getDevices() {
+        const devices = await api.getDevices();
+        setDevices(devices);
+    }
+
+    useEffect(() => {
+        getDevices();
+    }, []);
+
     return (
         <>
             <Box mx={10} mt={5}>
@@ -52,9 +62,13 @@ export default function Dashboard() {
                 <Divider my={5} borderColor="brand.100" />
 
                 <SimpleGrid columns={5} spacing={2}>
-                    <DeviceCard name="Puerta 1" stateDescription="Abierta" lastUpdate={new Date().toLocaleTimeString()} />
+                    {/* <DeviceCard name="Puerta 1" stateDescription="Abierta" lastUpdate={new Date().toLocaleTimeString()} />
                     <DeviceCard name="Puerta 2" stateDescription="Cerrada" lastUpdate={new Date().toLocaleTimeString()} />
-                    <DeviceCard name="Puerta 3" stateDescription="Abierta" lastUpdate={new Date().toLocaleTimeString()} />
+                    <DeviceCard name="Puerta 3" stateDescription="Abierta" lastUpdate={new Date().toLocaleTimeString()} /> */}
+
+                    {devices && devices.map(d => {
+                        return <DeviceCard key={d.deviceId} name={d.name} stateDescription='&nbsp;' />
+                    })}
                 </SimpleGrid>
             </Box>
         </>
