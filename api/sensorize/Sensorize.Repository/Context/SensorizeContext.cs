@@ -1,15 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sensorize.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sensorize.Repository.Context
 {
     public class SensorizeContext : DbContext, ISensorizeContext
     {
+        public DbSet<Device> Devices => Set<Device>();
         public DbSet<DeviceType> DeviceTypes => Set<DeviceType>();
 
         public SensorizeContext(DbContextOptions<SensorizeContext> options) : base(options) { }

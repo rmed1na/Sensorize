@@ -25,7 +25,7 @@ export default function DeviceType() {
                     <Flex direction="row" mx={10} mt={5} gap={4}>
                         <Box w="40%">
                             <Heading as="h3" color="brand.500" p={1}># tipos</Heading>
-                            <Divider mb={5} />
+                            <Divider mb={3} />
 
                             <Box maxH={750} sx={{ overflowY: 'auto', cursor: 'pointer' }}>
                                 <DeviceTypeListItem name="Tanque" measure="Volumen" isNewPlaceholder={true} />

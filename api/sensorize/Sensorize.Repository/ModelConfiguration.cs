@@ -8,6 +8,13 @@ namespace Sensorize.Repository
     {
         public static void Apply(ModelBuilder builder)
         {
+            builder.Entity<Device>(e =>
+            {
+                e.ToTable("devices");
+                e.HasKey(x => x.DeviceId);
+                e.Property(x => x.DeviceId).UseMySQLAutoIncrementColumn("int");
+            });
+
             builder.Entity<DeviceType>(e =>
             {
                 e.ToTable("device_types");

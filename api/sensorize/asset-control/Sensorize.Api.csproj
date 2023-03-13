@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Sensorize.Domain\Sensorize.Domain.csproj" />
     <ProjectReference Include="..\Sensorize.Repository\Sensorize.Repository.csproj" />
+    <ProjectReference Include="..\Sensorize.Utility\Sensorize.Utility.csproj" />
   </ItemGroup>
 
 </Project>

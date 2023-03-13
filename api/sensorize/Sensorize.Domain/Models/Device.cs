@@ -3,10 +3,12 @@ using Sensorize.Domain.Models.Meta;
 
 namespace Sensorize.Domain.Models
 {
-    public class DeviceType : BaseModel
+    public class Device : BaseModel
     {
-        public int DeviceTypeId { get; set; }
+        public int DeviceId { get; set; }
         public string Name { get; set; } = string.Empty;
+        public GlobalStatusCode StatusCode { get; set; }
         public MeasureTypeCode MeasureTypeCode { get; set; }
+        public string? Channel { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Sensorize.Repository.Context;
+using Sensorize.Repository.Repository;
 
 namespace Sensorize.Api
 {
@@ -8,6 +9,8 @@ namespace Sensorize.Api
         {
             #region Scoped
             services.AddScoped<ISensorizeContext, SensorizeContext>();
+            services.AddScoped<IDeviceRepository, DeviceRepository>();
+            services.AddScoped<IDeviceTypeRepository, DeviceTypeRepository>();
             #endregion
         }
     }

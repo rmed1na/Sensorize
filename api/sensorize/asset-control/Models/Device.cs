@@ -2,7 +2,7 @@
 
 namespace AssetControl.Api.Models
 {
-    public class Device
+    public class DeviceOld
     {
         public Guid DeviceId { get; set; }
         public string Name { get; set; } = string.Empty;
