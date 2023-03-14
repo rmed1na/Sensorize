@@ -1,6 +1,5 @@
 const API_BASE_URL = 'https://localhost:7168/api';
 
-
 async function getDevices() {
     const response = await fetch(`${API_BASE_URL}/device`)
     
@@ -12,7 +11,7 @@ async function getDevices() {
     }
 }
 
-async function createDevice(device, callBack = null) {
+async function createDevice(device, successCallback = null, errorCallback = null) {
     const response = await fetch(`${API_BASE_URL}/device`, {
         method: 'POST',
         headers: {
@@ -20,6 +19,7 @@ async function createDevice(device, callBack = null) {
         },
         body: JSON.stringify({
             name: device.name,
+            topic: device.topic,
             measureTypeCode: device.measureTypeCode,
             channel: device.channel
         })
@@ -28,12 +28,17 @@ async function createDevice(device, callBack = null) {
     if (response.ok) {
         const data = await response.json();
 
-        if (callBack != null) {
-            callBack();
+        if (successCallback != null) {
+            successCallback();
         }
         
         return data;
     } else {
+        let message = await response.text();
+        if (errorCallback != null) {
+            errorCallback(message);
+        }
+
         throwError(response);
     }
 }
@@ -46,6 +51,7 @@ async function updateDevice(device, callBack = null) {
         },
         body: JSON.stringify({
             name: device.name,
+            topic: device.topic,
             channel: device.channel,
             measureTypeCode: device.measureTypeCode
         })

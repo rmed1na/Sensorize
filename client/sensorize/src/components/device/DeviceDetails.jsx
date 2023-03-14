@@ -17,7 +17,8 @@ import {
     AccordionIcon,
     AccordionPanel,
     Heading,
-    useToast
+    useToast,
+    Checkbox
 } from "@chakra-ui/react";
 // Chakra select
 import { Select as ChakraSelect, chakraComponents } from 'chakra-react-select';
@@ -57,31 +58,44 @@ export default function DeviceDetails({
         ),
     };
 
-    const handleMeasureChange = (e) => setDevice({ ...device, measureCode: e.value });
-    const handleChannelChange = (e) => setDevice({ ...device, channel: e.target.value});
-    const handleNameChange = (e) => setDevice({...device, name: e.target.value});
+    const handleMeasureTypeChange = (e) => setDevice({ ...device, measureTypeCode: e.value });
+    const handleTopicChange = (e) => setDevice({ ...device, topic: e.target.value });
+    const handleChannelChange = (e) => setDevice({ ...device, channel: e.target.value });
+    const handleNameChange = (e) => setDevice({ ...device, name: e.target.value });
 
-    async function save() {
+    async function upsert() {
         // New device
         if (!device || !device.deviceId || device.deviceId == 0) {
-            let response = await api.createDevice(device, function() {
-                toast({
-                    title: 'Dispositivo guardado',
-                    status: 'success',
-                    duration: 5000,
-                    isClosable: true,
-                    position: 'top'
+            let response = await api.createDevice(
+                device, 
+                function () {
+                    toast({
+                        title: 'Dispositivo guardado',
+                        status: 'success',
+                        duration: 5000,
+                        isClosable: true,
+                        position: 'top'
+                    });
+
+                    onDataSave();
+                },
+                function (errorMessage = '') {
+                    toast({
+                        title: 'Error',
+                        status: 'error',
+                        description: errorMessage,
+                        duration: 5000,
+                        isClosable: true,
+                        position: 'top'
+                    })
                 });
-    
-                onDataSave();
-            });
-    
+
             setDevice(response);
         }
 
         // Update device
         if (device && device.deviceId > 0) {
-            let response = await api.updateDevice(device, function() {
+            let response = await api.updateDevice(device, function () {
                 toast({
                     title: 'Dispositivo actualizado',
                     status: 'success',
@@ -101,10 +115,36 @@ export default function DeviceDetails({
         if (!device) {
             setDevice({
                 name: '',
+                topic: '',
                 channel: ''
             });
         }
     }, []);
+
+    const measureTypeDetails = () => {
+        switch (device?.measureTypeCode) {
+            case 1: // Volume
+                return (
+                <Flex>
+                    <FormControl py={2} pr={2} isRequired>
+                        <FormLabel>Capacidad máxima (litros)</FormLabel>
+                        <Input type="number" />
+                    </FormControl>
+                    <FormControl py={2} pr={2} isRequired>
+                        <FormLabel>Valor mínimo de lectura</FormLabel>
+                        <Input type="number" />
+                    </FormControl>
+                    <FormControl py={2} isRequired>
+                        <FormLabel>Valor máximo de lectura</FormLabel>
+                        <Input type="number" />
+                    </FormControl>
+                </Flex>)
+            case 2: // Temperature
+                break;
+            default: // Empty
+                break;
+        }
+    }
 
     return (
         <Box fontSize="0.875rem" fontWeight={500}>
@@ -133,32 +173,17 @@ export default function DeviceDetails({
                         </Flex>
                     </AccordionButton>
                     <AccordionPanel>
-                        <Stack>
-                            <FormControl py={2} isRequired>
-                                <FormLabel>Nombre</FormLabel>
-                                <Input
-                                    placeholder="Nombre del dispositivo (tanque, planta, etc.)"
-                                    type="text"
-                                    onChange={e => handleNameChange(e)}
-                                    value={device ? device.name : ''} />
-                            </FormControl>
-                            <FormControl py={2} isRequired>
-                                <FormLabel>Medida</FormLabel>
-                                <ChakraSelect
-                                    menuPosition="fixed"
-                                    name="measureType"
-                                    options={measureOptions}
-                                    placeholder="Selecccione un tipo de medida"
-                                    components={customComponents}
-                                    onChange={e => handleMeasureChange(e)}
-                                    colorScheme="brand"
-                                    value={measureOptions.find(m => m.value == device?.measureTypeCode)}
-                                    ></ChakraSelect>
-                            </FormControl>
-                        </Stack>
+                        <FormControl py={2} isRequired>
+                            <FormLabel>Nombre</FormLabel>
+                            <Input
+                                placeholder="Nombre del dispositivo (tanque, planta, etc.)"
+                                type="text"
+                                onChange={e => handleNameChange(e)}
+                                value={device ? device.name : ''} />
+                        </FormControl>
                     </AccordionPanel>
                 </AccordionItem>
-                
+
                 {/* MQTT */}
                 <AccordionItem>
                     <AccordionButton>
@@ -168,21 +193,53 @@ export default function DeviceDetails({
                         </Flex>
                     </AccordionButton>
                     <AccordionPanel>
-                        <Stack>
-                            <FormControl py={2}>
-                                <FormLabel>Canal</FormLabel>
-                                <Input 
-                                    placeholder="Canal de comunicación de datos en MQTT"
-                                    type="text"
-                                    onChange={e => handleChannelChange(e)}
-                                    value={device ? device.channel : ''} />
-                            </FormControl>
-                        </Stack>
+                        <FormControl py={2}>
+                            <FormLabel>Tópico</FormLabel>
+                            <Input
+                                placeholder="Tópico de comunicación en MQTT"
+                                type="text"
+                                onChange={e => handleTopicChange(e)}
+                                value={device ? device.topic : ''} />
+                        </FormControl>
+                        <FormControl py={2}>
+                            <FormLabel>Canal</FormLabel>
+                            <Input
+                                placeholder="Canal para lectura del dato"
+                                type="text"
+                                onChange={e => handleChannelChange(e)}
+                                value={device ? device.channel : ''} />
+                        </FormControl>
+                    </AccordionPanel>
+                </AccordionItem>
+
+                {/* Measure type */}
+                <AccordionItem>
+                    <AccordionButton>
+                        <Flex justify="space-between" w="full">
+                            <Heading as="h4" fontWeight={500}>Medición</Heading>
+                            <AccordionIcon />
+                        </Flex>
+                    </AccordionButton>
+                    <AccordionPanel>
+                        <FormControl py={2} isRequired>
+                            <FormLabel>Tipo de medida</FormLabel>
+                            <ChakraSelect
+                                menuPosition="fixed"
+                                name="measureType"
+                                options={measureOptions}
+                                placeholder="Selecccione un tipo de medida"
+                                components={customComponents}
+                                onChange={e => handleMeasureTypeChange(e)}
+                                colorScheme="brand"
+                                value={measureOptions.find(m => m.value == device?.measureTypeCode)}
+                            ></ChakraSelect>
+                        </FormControl>
+                        { measureTypeDetails() }
                     </AccordionPanel>
                 </AccordionItem>
             </Accordion>
             <Flex gap={2} justify="flex-end" my={5}>
-                <Button size="sm" onClick={save}>Guardar</Button>
+                <Button size="sm" onClick={upsert}>Guardar</Button>
             </Flex>
         </Box>
     )

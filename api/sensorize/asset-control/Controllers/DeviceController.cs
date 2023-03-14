@@ -45,6 +45,7 @@ namespace AssetControl.Api.Controllers
                 Name = request.Name,
                 MeasureTypeCode = request.MeasureTypeCode,
                 StatusCode = GlobalStatusCode.Active,
+                Topic = request.Topic,
                 Channel = request.Channel
             };
 
@@ -68,12 +69,15 @@ namespace AssetControl.Api.Controllers
                 return NotFound($"Device with id {deviceId} not found");
 
             device.Name = request.Name ?? device.Name;
+            device.Topic = request.Topic;
             device.Channel = request.Channel;
             device.MeasureTypeCode = request.MeasureTypeCode;
 
             await _deviceRepository.SaveAsync(device);
             return Ok(device);
         }
+
+
 
         [HttpGet]
         [Route("all")]

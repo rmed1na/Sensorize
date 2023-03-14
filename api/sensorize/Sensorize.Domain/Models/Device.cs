@@ -9,6 +9,7 @@ namespace Sensorize.Domain.Models
         public string Name { get; set; } = string.Empty;
         public GlobalStatusCode StatusCode { get; set; }
         public MeasureTypeCode MeasureTypeCode { get; set; }
+        public string? Topic { get; set; }
         public string? Channel { get; set; }
     }
 }

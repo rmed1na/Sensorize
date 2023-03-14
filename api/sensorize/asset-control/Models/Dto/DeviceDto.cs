@@ -13,6 +13,7 @@ namespace Sensorize.Api.Models.Dto
 		public MeasureTypeCode MeasureTypeCode { get; set; }
 		public string? MeasureType { get; set; }
 		public bool IsActive { get; set; }
+		public string? Topic { get; set; }
 		public string? Channel { get; set; }
 
 		public DeviceDto() { }
@@ -26,6 +27,7 @@ namespace Sensorize.Api.Models.Dto
 			MeasureTypeCode = device.MeasureTypeCode;
 			MeasureType = device.MeasureTypeCode.GetDisplayName();
 			IsActive = device.StatusCode == GlobalStatusCode.Active;
+			Topic = device.Topic;
 			Channel = device.Channel;
 		}
 	}
