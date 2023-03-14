@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Sensorize.Api;
 using Sensorize.Api.Models.AppSettings;
 using Sensorize.Repository.Context;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var appSettings = builder.Configuration
@@ -12,7 +13,15 @@ var appSettings = builder.Configuration
 
 // Add services to the container.
 builder.Services.AddSignalR();
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(opt =>
+    {
+        opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+        if (builder.Environment.IsDevelopment())
+            opt.JsonSerializerOptions.WriteIndented = true;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

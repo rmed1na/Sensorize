@@ -23,6 +23,7 @@ namespace Sensorize.Repository.Repository
         public async Task<ICollection<Device>> GetAllAsync()
         {
             return await _ctx.Devices
+                .Include(x => x.MeasureProperties)
                 .Where(x => x.StatusCode == GlobalStatusCode.Active)
                 .ToListAsync();
         }

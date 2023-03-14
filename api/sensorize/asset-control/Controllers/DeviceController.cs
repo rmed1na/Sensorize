@@ -49,6 +49,13 @@ namespace AssetControl.Api.Controllers
                 Channel = request.Channel
             };
 
+            if (request.MeasureProperties != null && request.MeasureProperties.Any())
+            {
+                device.MeasureProperties = new List<DeviceMeasureProperty>();
+                foreach (var prop in request.MeasureProperties)
+                    device.MeasureProperties.Add(new DeviceMeasureProperty(device, prop.Code, prop.Value));
+            }
+
             await _deviceRepository.AddAsync(device);
             return Ok(new DeviceDto(device));
         }
@@ -72,6 +79,22 @@ namespace AssetControl.Api.Controllers
             device.Topic = request.Topic;
             device.Channel = request.Channel;
             device.MeasureTypeCode = request.MeasureTypeCode;
+
+            if (request.MeasureProperties != null && request.MeasureProperties.Any())
+            {
+                device.MeasureProperties ??= new List<DeviceMeasureProperty>();
+				foreach (var property in request.MeasureProperties)
+				{
+                    var existing = device.MeasureProperties.FirstOrDefault(p => p.PropertyCode == property.Code);
+                    if (existing != null)
+                    {
+                        existing.PropertyValue = property.Value;
+                        existing.SetUpdated();
+                    }
+                    else
+                        device.MeasureProperties.Add(new DeviceMeasureProperty(device, property.Code, property.Value));
+				}
+			}
 
             await _deviceRepository.SaveAsync(device);
             return Ok(device);

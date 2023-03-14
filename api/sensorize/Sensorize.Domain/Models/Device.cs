@@ -11,5 +11,7 @@ namespace Sensorize.Domain.Models
         public MeasureTypeCode MeasureTypeCode { get; set; }
         public string? Topic { get; set; }
         public string? Channel { get; set; }
+
+        public virtual ICollection<DeviceMeasureProperty>? MeasureProperties { get; set; }
     }
 }

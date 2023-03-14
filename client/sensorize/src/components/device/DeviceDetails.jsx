@@ -8,7 +8,6 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Stack,
     Text,
     Icon,
     Accordion,
@@ -62,12 +61,29 @@ export default function DeviceDetails({
     const handleTopicChange = (e) => setDevice({ ...device, topic: e.target.value });
     const handleChannelChange = (e) => setDevice({ ...device, channel: e.target.value });
     const handleNameChange = (e) => setDevice({ ...device, name: e.target.value });
+    const handleMeasurePropChange = (code, value) => {
+        let exists = false;
+        let updatedProps = device.measureProperties.map(p => {
+            if (p.code == code) {
+                exists = true;
+                return { ...p, value: value };
+            }
+            return p;
+        });
+
+        if (!exists) {
+            updatedProps.push({ code: code, value: value });
+        }
+
+        console.log('updatedProps', updatedProps);
+        setDevice({ ...device, measureProperties: updatedProps });
+    }
 
     async function upsert() {
         // New device
         if (!device || !device.deviceId || device.deviceId == 0) {
             let response = await api.createDevice(
-                device, 
+                device,
                 function () {
                     toast({
                         title: 'Dispositivo guardado',
@@ -112,38 +128,45 @@ export default function DeviceDetails({
     }
 
     useEffect(() => {
+        // Default values
         if (!device) {
             setDevice({
                 name: '',
                 topic: '',
-                channel: ''
+                channel: '',
+                measureProperties: []
             });
         }
     }, []);
 
+    const safePropertyValue = (code) => device ? device.measureProperties.find(x => x.code == code).value : '';
     const measureTypeDetails = () => {
+        let component;
         switch (device?.measureTypeCode) {
             case 1: // Volume
-                return (
-                <Flex>
-                    <FormControl py={2} pr={2} isRequired>
-                        <FormLabel>Capacidad máxima (litros)</FormLabel>
-                        <Input type="number" />
-                    </FormControl>
-                    <FormControl py={2} pr={2} isRequired>
-                        <FormLabel>Valor mínimo de lectura</FormLabel>
-                        <Input type="number" />
-                    </FormControl>
-                    <FormControl py={2} isRequired>
-                        <FormLabel>Valor máximo de lectura</FormLabel>
-                        <Input type="number" />
-                    </FormControl>
-                </Flex>)
+                component = (
+                    <Flex>
+                        <FormControl py={2} pr={2} isRequired>
+                            <FormLabel>Capacidad máxima (litros)</FormLabel>
+                            <Input type="number" value={safePropertyValue('VOL.MAXCAP')} onChange={e => handleMeasurePropChange('VOL.MAXCAP', e.target.value)} />
+                        </FormControl>
+                        <FormControl py={2} pr={2} isRequired>
+                            <FormLabel>Valor mínimo de lectura</FormLabel>
+                            <Input type="number" value={safePropertyValue('VOL.MINVALUE')} onChange={e => handleMeasurePropChange('VOL.MINVALUE', e.target.value)} />
+                        </FormControl>
+                        <FormControl py={2} isRequired>
+                            <FormLabel>Valor máximo de lectura</FormLabel>
+                            <Input type="number" value={safePropertyValue('VOL.MAXVALUE')} onChange={e => handleMeasurePropChange('VOL.MAXVALUE', e.target.value)} />
+                        </FormControl>
+                    </Flex>);
+                break;
             case 2: // Temperature
                 break;
             default: // Empty
                 break;
         }
+
+        return component;
     }
 
     return (
@@ -234,7 +257,7 @@ export default function DeviceDetails({
                                 value={measureOptions.find(m => m.value == device?.measureTypeCode)}
                             ></ChakraSelect>
                         </FormControl>
-                        { measureTypeDetails() }
+                        {measureTypeDetails()}
                     </AccordionPanel>
                 </AccordionItem>
             </Accordion>

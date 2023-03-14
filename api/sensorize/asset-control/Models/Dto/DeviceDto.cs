@@ -15,6 +15,7 @@ namespace Sensorize.Api.Models.Dto
 		public bool IsActive { get; set; }
 		public string? Topic { get; set; }
 		public string? Channel { get; set; }
+		public ICollection<MeasurePropertyDto> MeasureProperties { get; set; } = new List<MeasurePropertyDto>();
 
 		public DeviceDto() { }
 
@@ -29,6 +30,13 @@ namespace Sensorize.Api.Models.Dto
 			IsActive = device.StatusCode == GlobalStatusCode.Active;
 			Topic = device.Topic;
 			Channel = device.Channel;
+
+			if (device.MeasureProperties != null && device.MeasureProperties.Any())
+			{
+				MeasureProperties = new List<MeasurePropertyDto>();
+				foreach (var mprop in device.MeasureProperties)
+					MeasureProperties.Add(new MeasurePropertyDto(mprop));
+			}
 		}
 	}
 }
