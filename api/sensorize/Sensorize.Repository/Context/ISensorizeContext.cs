@@ -8,8 +8,10 @@ namespace Sensorize.Repository.Context
         DbSet<Device> Devices { get; }
         DbSet<DeviceType> DeviceTypes { get; }
         DbSet<DeviceMeasureProperty> DeviceMeasureProperties { get; }
+        DbSet<DeviceState> DeviceStates { get; }
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task ReloadAsync<T>(T entity);
+		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         int SaveChanges();
     }
 }

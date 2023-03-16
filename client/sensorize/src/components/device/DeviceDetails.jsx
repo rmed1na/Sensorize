@@ -75,7 +75,6 @@ export default function DeviceDetails({
             updatedProps.push({ code: code, value: value });
         }
 
-        console.log('updatedProps', updatedProps);
         setDevice({ ...device, measureProperties: updatedProps });
     }
 
@@ -139,7 +138,17 @@ export default function DeviceDetails({
         }
     }, []);
 
-    const safePropertyValue = (code) => device ? device.measureProperties.find(x => x.code == code).value : '';
+    const safePropertyValue = (code) => {
+        if (!device || !device.measureProperties || device.measureProperties.length == 0)
+            return '';
+
+        let prop = device.measureProperties.find(x => x.code == code);
+        if (prop) {
+            return prop.value;
+        }
+
+        return '';
+    };
     const measureTypeDetails = () => {
         let component;
         switch (device?.measureTypeCode) {
@@ -202,7 +211,7 @@ export default function DeviceDetails({
                                 placeholder="Nombre del dispositivo (tanque, planta, etc.)"
                                 type="text"
                                 onChange={e => handleNameChange(e)}
-                                value={device ? device.name : ''} />
+                                value={device ? device?.name : ''} />
                         </FormControl>
                     </AccordionPanel>
                 </AccordionItem>
@@ -222,7 +231,7 @@ export default function DeviceDetails({
                                 placeholder="Tópico de comunicación en MQTT"
                                 type="text"
                                 onChange={e => handleTopicChange(e)}
-                                value={device ? device.topic : ''} />
+                                value={device ? device?.topic : ''} />
                         </FormControl>
                         <FormControl py={2}>
                             <FormLabel>Canal</FormLabel>
@@ -230,7 +239,7 @@ export default function DeviceDetails({
                                 placeholder="Canal para lectura del dato"
                                 type="text"
                                 onChange={e => handleChannelChange(e)}
-                                value={device ? device.channel : ''} />
+                                value={device ? device?.channel : ''} />
                         </FormControl>
                     </AccordionPanel>
                 </AccordionItem>

@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using MQTTnet;
 using MQTTnet.Client;
+using Sensorize.Api.Controllers.Handlers;
+using Sensorize.Repository.Repository;
+using System.Text.Json;
 
 namespace AssetControl.Api.EventListeners
 {
@@ -9,41 +12,57 @@ namespace AssetControl.Api.EventListeners
         private readonly MqttFactory _mqttFactory;
         private readonly IMqttClient _mqttClient;
         private readonly IMemoryCache _cache;
+        private readonly IDeviceRepository _deviceRepository;
+
+        public static string StreamKey => "sensorize_device_status";
 
         public DeviceStatusListener(IServiceProvider serviceProvider)
         {
+            var scope = serviceProvider.CreateScope();
+
             _mqttFactory = new MqttFactory();
             _mqttClient = _mqttFactory.CreateMqttClient();
             _cache = serviceProvider.GetRequiredService<IMemoryCache>();
+            _deviceRepository = scope.ServiceProvider.GetRequiredService<IDeviceRepository>();
         }
 
         public async Task ListenAsync()
         {
-            await _mqttClient.ConnectAsync(BuildMqttClient("localhost"), CancellationToken.None);
-            _mqttClient.ApplicationMessageReceivedAsync += e =>
+            var devices = await _deviceRepository.GetAllAsync();
+            if (devices == null || !devices.Any())
             {
-                const string Key = "mqtt-stream";
-                var message = e.ApplicationMessage.ConvertPayloadToString();
-                Console.WriteLine($"{DateTime.Now} - MQTT message: \n{message}");
+                Console.WriteLine("No devices to subscribe to");
+				return;
+			}
 
-                _cache.Set($"{Key}.{e.ApplicationMessage.Topic}", message);
-                //var data = _cache.Get<List<string>>(Key) ?? new List<string>();
-                //data.Add(message);
-                //_cache.Set(Key, data, DateTime.Now.AddMinutes(5));
-                //
-                //Console.WriteLine($"{DateTime.Now} - queue size: {data.Count}");
+			// TODO: Replace localhost with db value
+			await _mqttClient.ConnectAsync(BuildMqttClient("localhost"), CancellationToken.None);
+            _mqttClient.ApplicationMessageReceivedAsync += async e =>
+            {
+                var device = await _deviceRepository.GetAsync(e.ApplicationMessage.Topic);
 
-                return Task.CompletedTask;
+                if (device != null)
+                {
+					var data = JsonSerializer.Deserialize<Dictionary<string, object>>(e.ApplicationMessage.ConvertPayloadToString());
+                    if (data == null || !data.Any())
+                        return;
+
+                    data.TryGetValue(device.Channel!, out object? measurementObj);
+                    if (measurementObj == null)
+                        return;
+
+                    var measurementStr = measurementObj.ToString();
+                    if (!string.IsNullOrEmpty(measurementStr) && double.TryParse(measurementStr, out double measurement))
+                    {
+                        var state = DeviceStateHandler.ComputeMeasurement(device, measurement);
+                        await _deviceRepository.UpsertState(state);
+                    }
+				}
             };
 
-            //4dcb7421-6e6f-411a-a56b-7fdcd655086b
-            //cde376af-8072-4edc-811b-f02ca86e88a1
-            //await SubscribeToTopicAsync("test_Data");
-            await SubscribeToTopicAsync("4dcb7421-6e6f-411a-a56b-7fdcd655086b/data"); // door 1
-            await SubscribeToTopicAsync("22ddaecc-780c-45fa-8fea-12e12821f3f6/data"); // door 2
-            await SubscribeToTopicAsync("cde376af-8072-4edc-811b-f02ca86e88a1/data"); // A/C 1
-            await SubscribeToTopicAsync("c4e14e7a-8da4-4c5c-81fb-6c9dcbc827bc/data"); // A/C 2
-            await SubscribeToTopicAsync("741c8960-c20f-4f23-837d-80f453aab884/data"); // A/C 3
+			// TODO: Handle new subscriptions that may come in after startup (new added device)
+			foreach (var topic in devices.Where(d => d.Topic != null).Select(d => d.Topic))
+                await SubscribeToTopicAsync(topic!);
         }
 
         #region Helpers

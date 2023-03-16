@@ -9,6 +9,8 @@ namespace Sensorize.Repository.Repository
     {
         private readonly ISensorizeContext _ctx;
 
+        public ISensorizeContext Context => _ctx;
+
         public DeviceRepository(ISensorizeContext ctx) => _ctx = ctx;
 
         public async Task AddAsync(Device device)
@@ -18,14 +20,45 @@ namespace Sensorize.Repository.Repository
         }
 
         public async Task<Device?> GetAsync(int id)
-            => await _ctx.Devices.FirstOrDefaultAsync(d => d.DeviceId == id);
+            => await _ctx.Devices
+                .Include(x => x.MeasureProperties)
+                .FirstOrDefaultAsync(d => d.DeviceId == id);
 
-        public async Task<ICollection<Device>> GetAllAsync()
+        public async Task<Device?> GetAsync(string topic)
+            => await _ctx.Devices
+                .Include(x => x.MeasureProperties)
+                .FirstOrDefaultAsync(x => x.Topic != null && x.Topic.ToLower() == topic.ToLower());
+
+        public async Task<ICollection<Device>> GetAllAsync(bool onlyActive = true)
         {
             return await _ctx.Devices
                 .Include(x => x.MeasureProperties)
-                .Where(x => x.StatusCode == GlobalStatusCode.Active)
+                .Where(x => !onlyActive || (onlyActive && x.StatusCode == GlobalStatusCode.Active))
                 .ToListAsync();
+        }
+
+        public async Task<ICollection<DeviceState>> GetStatesAsync(bool onlyActive = true)
+        {
+            return await _ctx.DeviceStates
+                .Include(x => x.Device)
+                .Where(x => x.Device!.StatusCode == GlobalStatusCode.Active)
+                .ToListAsync();
+        }
+
+		public async Task UpsertState(DeviceState state)
+        {
+            var oldState = await _ctx.DeviceStates.FirstOrDefaultAsync(x => x.DeviceId == state.DeviceId);
+            if (oldState != null)
+            {
+                oldState.Measurement = state.Measurement;
+                oldState.Description = state.Description;
+                oldState.SetUpdated();
+                await _ctx.SaveChangesAsync();
+                return;
+            }
+
+            await _ctx.DeviceStates.AddAsync(state);
+            await _ctx.SaveChangesAsync();
         }
 
         public async Task SaveAsync(Device device)

@@ -1,6 +1,6 @@
 ﻿namespace AssetControl.Api.Models
 {
-    public class DeviceStatus
+    public class DeviceStatusOld
     {
         public Guid DeviceId { get; set; }
         public bool IsOnAlert { get; set; }

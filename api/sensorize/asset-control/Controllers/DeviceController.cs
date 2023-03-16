@@ -1,9 +1,12 @@
-﻿using AssetControl.Api.Models;
+﻿using AssetControl.Api.EventListeners;
+using AssetControl.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Sensorize.Api.Controllers.Handlers;
 using Sensorize.Api.Models.Dto;
 using Sensorize.Domain.Enums;
 using Sensorize.Domain.Models;
+using Sensorize.Repository.Context;
 using Sensorize.Repository.Repository;
 using System.Text.Json;
 
@@ -39,6 +42,7 @@ namespace AssetControl.Api.Controllers
                 return BadRequest("Name can't be null or empty");
             if (request.MeasureTypeCode == MeasureTypeCode.Unknown)
                 return BadRequest("Meausre code must be defined");
+            // TODO: Validate topic is unique
 
             var device = new Device
             {
@@ -83,8 +87,8 @@ namespace AssetControl.Api.Controllers
             if (request.MeasureProperties != null && request.MeasureProperties.Any())
             {
                 device.MeasureProperties ??= new List<DeviceMeasureProperty>();
-				foreach (var property in request.MeasureProperties)
-				{
+                foreach (var property in request.MeasureProperties)
+                {
                     var existing = device.MeasureProperties.FirstOrDefault(p => p.PropertyCode == property.Code);
                     if (existing != null)
                     {
@@ -93,13 +97,87 @@ namespace AssetControl.Api.Controllers
                     }
                     else
                         device.MeasureProperties.Add(new DeviceMeasureProperty(device, property.Code, property.Value));
-				}
-			}
+                }
+            }
 
             await _deviceRepository.SaveAsync(device);
-            return Ok(device);
+            return Ok(new DeviceDto(device));
         }
 
+        [HttpGet]
+        [Route("states")]
+        public async Task StreamDeviceStatesAsync()
+        {
+            var cycles = 0;
+            var response = Response;
+            response.Headers.Add("Content-Type", "text/event-stream");
+
+			var deviceStates = await _deviceRepository.GetStatesAsync();
+			var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            while (cycles <= 1_000)
+            {
+                foreach (var state in deviceStates)
+                {
+                    await _deviceRepository.Context.ReloadAsync(state);
+					await response.WriteAsync($"data: {JsonSerializer.Serialize(new DeviceStateDto(state), jsonOptions)}\n\n");
+					await response.Body.FlushAsync();
+				}
+                cycles++;
+				await Task.Delay(5_000);
+			}
+        }
+
+
+        [HttpGet]
+        [Route("statuses")]
+        [Obsolete]
+        public async Task GetDevicesStatusesAsync()
+        {
+            var response = Response;
+            response.Headers.Add("Content-Type", "text/event-stream");
+
+            var devices = await _deviceRepository.GetAllAsync();
+
+            foreach (var device in devices.Where(d => d.Channel != null))
+            {
+                var key = $"{DeviceStatusListener.StreamKey}.{device.Topic}";
+                var rawData = _cache.Get<string>(key);
+                if (rawData == null)
+                    continue;
+
+                _cache.Remove(key);
+
+                var data = JsonSerializer.Deserialize<Dictionary<string, object>>(rawData);
+                if (data == null)
+                    continue;
+
+                data.TryGetValue(device.Channel!, out object? measurementObj);
+
+                if (measurementObj == null)
+                    continue;
+
+                var measurementStr = measurementObj.ToString();
+                if (!string.IsNullOrEmpty(measurementStr) && double.TryParse(measurementStr, out double measurement))
+                {
+                    //var status = new DeviceStatusDto(device, measurement);
+                    var status = DeviceStateHandler.ComputeMeasurement(device, measurement);
+                    var statusJson = JsonSerializer.Serialize(status, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
+
+                    await response.WriteAsync($"data: {statusJson}\n\n");
+					await response.Body.FlushAsync();
+					await Task.Delay(500);
+				}
+            }
+        }
 
 
         [HttpGet]
@@ -113,6 +191,7 @@ namespace AssetControl.Api.Controllers
         [Route("stream/statuses")]
         public async Task GetDeviceStatusesStreamAsync()
         {
+            /*
             var response = Response;
             response.Headers.Add("Content-Type", "text/event-stream");
 
@@ -131,7 +210,7 @@ namespace AssetControl.Api.Controllers
                 var data = $"data: {JsonSerializer.Serialize(status, jsonOpt)}\n\n";
                 await response.WriteAsync(data);
                 await response.Body.FlushAsync();
-            }
+            }*/
             //const string Key = "mqtt-stream";
             //var items = _cache.Get<List<string>>(Key) ?? new List<string>();
             //_cache.Remove(Key);
@@ -184,72 +263,15 @@ namespace AssetControl.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{deviceId:Guid}/status")]
+        [Route("{deviceId:Guid}/status_x")]
         public async Task<IActionResult> GetDeviceStatusAsync(Guid deviceId)
         {
             var device = _tempDevices.FirstOrDefault(x => x.DeviceId == deviceId);
             if (device == null)
                 return NotFound("Device not found");
 
-            var status = GetDeviceStatusInternal(device);
-            return Ok(status);
-        }
-
-        private DeviceStatus? GetDeviceStatusInternal(DeviceOld device)
-        {
-            var raw = _cache.Get<string>($"mqtt-stream.{device.Topic}");
-            if (raw != null)
-            {
-                _cache.Remove($"mqtt-stream.{device.Topic}");
-                var data = JsonSerializer.Deserialize<Dictionary<string, object>>(raw);
-                if (data == null)
-                    return null;
-
-                switch (device.Type)
-                {
-                    case DeviceTypeCode.Temperature:
-                        {
-                            if (data.TryGetValue(device.Channel, out object measureObj))
-                            {
-                                double.TryParse(measureObj.ToString(), out double measure);
-                                var isOnAlert = measure >= 100;
-                                var status = new DeviceStatus
-                                {
-                                    DeviceId = device.DeviceId,
-                                    Measure = measure,
-                                    Description = measure.ToString(),
-                                    IsOnAlert = isOnAlert,
-                                    IconClass = isOnAlert ? "fa-solid fa-temperature-arrow-up" : "fa-solid fa-temperature-arrow-down"
-                                };
-
-                                return status;
-                            }
-                        }
-                        break;
-                    case DeviceTypeCode.Binary:
-                        {
-                            if (data.TryGetValue(device.Channel, out object measureObj))
-                            {
-                                bool.TryParse(measureObj.ToString(), out bool isOn);
-                                var status = new DeviceStatus
-                                {
-                                    DeviceId = device.DeviceId,
-                                    Measure = isOn ? 1 : 0,
-                                    Description = isOn ? "Abierta" : "Cerrada",
-                                    IsOnAlert = isOn,
-                                    IconClass = isOn ? "fa-solid fa-door-open" : "fa-solid fa-door-closed"
-                                };
-
-                                return status;
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            return null;
+            //var status = GetDeviceStatusInternal(device);
+            return Ok();
         }
     }
 }

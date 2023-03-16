@@ -5,7 +5,8 @@ import {
     CardHeader,
     Heading,
     Text,
-    Box
+    Box,
+    Flex
 } from '@chakra-ui/react';
 
 export default function DeviceCard({
@@ -24,10 +25,13 @@ export default function DeviceCard({
                     <Heading as="h4">{name}</Heading>
                 </CardHeader>
                 <CardBody py={2}>
-                    <Text fontSize="0.8125rem">Última actualización: {lastUpdate ? lastUpdate : '-'}</Text>
+                    <Flex fontSize="0.8125rem" direction="column">
+                        <Text>Última actualización hace:</Text>
+                        <Text color="blackAlpha.700" fontWeight={600}>{lastUpdate}</Text>
+                    </Flex>
                 </CardBody>
                 <CardFooter borderBottomRadius="md" bg="blackAlpha.100" py={3} fontWeight={500} color="blackAlpha.700">
-                    <Text>{stateDescription}</Text>
+                    <Text w="full" textAlign="center">{stateDescription ? stateDescription : <span>&nbsp;</span>}</Text>
                 </CardFooter>
             </Card>
         </>

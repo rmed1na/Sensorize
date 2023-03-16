@@ -30,6 +30,14 @@ namespace Sensorize.Repository
                 e.Property(x => x.DeviceMeasurePropertyId).UseMySQLAutoIncrementColumn("int");
                 e.HasOne(x => x.Device).WithMany(x => x.MeasureProperties).HasForeignKey(x => x.DeviceId);
             });
+
+            builder.Entity<DeviceState>(e =>
+            {
+                e.ToTable("device_states");
+                e.HasKey(x => x.DeviceStateId);
+                e.Property(x => x.DeviceStateId).UseMySQLAutoIncrementColumn("int");
+                e.HasOne(x => x.Device).WithMany().HasForeignKey(x => x.DeviceId);
+            });
         }
     }
 }

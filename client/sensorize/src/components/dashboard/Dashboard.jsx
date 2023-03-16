@@ -1,5 +1,5 @@
 // React
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // Chakra
 import { 
     Box, 
@@ -20,14 +20,36 @@ import api from '../../api/api';
 
 export default function Dashboard() {
     const [devices, setDevices] = useState([]);
+    const [deviceStates, setDeviceStates] = useState([]);
+    const deviceStatesRef = useRef(deviceStates);
 
-    async function getDevices() {
+    async function loadDevices() {
         const devices = await api.getDevices();
         setDevices(devices);
     }
 
     useEffect(() => {
-        getDevices();
+        loadDevices();
+
+        const eventSource = api.getStatusEventSource();
+        
+        eventSource.onmessage = (e) => {
+            let data = {
+                ...JSON.parse(e.data),
+                lastUpdate: new Date().toLocaleDateString()
+            };
+
+            let updatedDeviceStates = deviceStatesRef.current
+                .filter(x => x.device.deviceId !== data.device.deviceId)
+                .concat(data);
+
+            deviceStatesRef.current = updatedDeviceStates;
+            setDeviceStates(updatedDeviceStates);
+        }
+
+        return () => {
+            eventSource.close();
+        }
     }, []);
 
     return (
@@ -37,7 +59,7 @@ export default function Dashboard() {
                     <Flex gap={2} align="center">
                         <Icon as={BiChip} boxSize={8} />
                         <Box>
-                            <Heading>0</Heading>
+                            <Heading>{devices?.length}</Heading>
                             <Text>Dispositivos</Text>
                         </Box>
                     </Flex>
@@ -62,12 +84,13 @@ export default function Dashboard() {
                 <Divider my={5} borderColor="brand.100" />
 
                 <SimpleGrid columns={5} spacing={2}>
-                    {/* <DeviceCard name="Puerta 1" stateDescription="Abierta" lastUpdate={new Date().toLocaleTimeString()} />
-                    <DeviceCard name="Puerta 2" stateDescription="Cerrada" lastUpdate={new Date().toLocaleTimeString()} />
-                    <DeviceCard name="Puerta 3" stateDescription="Abierta" lastUpdate={new Date().toLocaleTimeString()} /> */}
-
                     {devices && devices.map(d => {
-                        return <DeviceCard key={d.deviceId} name={d.name} stateDescription='&nbsp;' />
+                        let status = deviceStates.find(s => s.device.deviceId == d.deviceId);
+                        return <DeviceCard 
+                                    key={d.deviceId} 
+                                    name={d.name}
+                                    lastUpdate={status?.timeSpanDescription}
+                                    stateDescription={status?.description} />
                     })}
                 </SimpleGrid>
             </Box>

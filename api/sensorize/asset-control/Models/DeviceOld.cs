@@ -8,7 +8,7 @@ namespace AssetControl.Api.Models
         public string Name { get; set; } = string.Empty;
         public DeviceTypeCode Type { get; set; }
         public string? Channel { get; set; }
-        public DeviceStatus? Status { get; set; }
+        public DeviceStatusOld? Status { get; set; }
         public string Topic => $"{DeviceId}/data";
     }
 }

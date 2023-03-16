@@ -72,12 +72,17 @@ async function updateDevice(device, callBack = null) {
     }
 }
 
+function getStatusEventSource() {
+    return new EventSource(`${API_BASE_URL}/device/states`);
+}
+
 function throwError(response) {
     throw new Error('Api call failed with status: ' + response.status);
 }
 
 export default {
     getDevices,
+    getStatusEventSource,
     createDevice,
     updateDevice
 }
