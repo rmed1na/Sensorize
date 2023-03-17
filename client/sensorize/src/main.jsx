@@ -30,7 +30,7 @@ import '@fontsource/rubik/900.css'
 import theme from './utils/theme'
 import App from './App'
 import Home from './pages/home/Home'
-import DeviceConfig from './pages/devices/DeviceList'
+import Devices from './pages/devices/Devices'
 import DeviceType from './pages/devices/type/DeviceType';
 
 // CSS
@@ -45,7 +45,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path='/' element={<App />} />
           <Route path='/login' element={<App />} />
           <Route path='/home' element={<Home />} />
-          <Route path='/device' element={<DeviceConfig />} />
+          <Route path='/device' element={<Devices />} />
           <Route path='/device/type' element={<DeviceType />} />
         </Routes>
       </BrowserRouter>

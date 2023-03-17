@@ -17,8 +17,10 @@ import { MdOutlineSync } from 'react-icons/md';
 // CC
 import DeviceCard from '../device/DeviceCard';
 import api from '../../api/api';
+import dateUtil from '../../utils/dateUtil';
 
 export default function Dashboard() {
+    const [lastUpdateDate, setLastUpdateDate] = useState('-');
     const [devices, setDevices] = useState([]);
     const [deviceStates, setDeviceStates] = useState([]);
     const deviceStatesRef = useRef(deviceStates);
@@ -38,7 +40,7 @@ export default function Dashboard() {
                 ...JSON.parse(e.data),
                 lastUpdate: new Date().toLocaleDateString()
             };
-
+            console.log('data', data);
             let updatedDeviceStates = deviceStatesRef.current
                 .filter(x => x.device.deviceId !== data.device.deviceId)
                 .concat(data);
@@ -51,6 +53,11 @@ export default function Dashboard() {
             eventSource.close();
         }
     }, []);
+
+    useEffect(() => {
+        let date = new Date();
+        setLastUpdateDate(dateUtil.toReadableString(date));
+    }, [deviceStates]);
 
     return (
         <>
@@ -67,7 +74,7 @@ export default function Dashboard() {
                     <Flex gap={2} align="center">
                         <Icon as={CgDanger} boxSize={8} />
                         <Box>
-                            <Heading>0</Heading>
+                            <Heading>{deviceStates?.filter(ds => ds.isOnAlert == true).length}</Heading>
                             <Text>Alertas</Text>
                         </Box>
                     </Flex>
@@ -75,7 +82,7 @@ export default function Dashboard() {
                     <Flex gap={2} align="center">
                         <Icon as={MdOutlineSync} boxSize={8} />
                         <Box>
-                            <Heading>-</Heading>
+                            <Heading as="h3">{lastUpdateDate}</Heading>
                             <Text>Última actualización</Text>
                         </Box>
                     </Flex>
@@ -90,6 +97,7 @@ export default function Dashboard() {
                                     key={d.deviceId} 
                                     name={d.name}
                                     lastUpdate={status?.timeSpanDescription}
+                                    isOnAlert={status?.isOnAlert}
                                     stateDescription={status?.description} />
                     })}
                 </SimpleGrid>

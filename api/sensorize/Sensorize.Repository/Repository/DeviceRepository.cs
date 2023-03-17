@@ -41,6 +41,7 @@ namespace Sensorize.Repository.Repository
         {
             return await _ctx.DeviceStates
                 .Include(x => x.Device)
+                .Include(x => x.Device!.MeasureProperties)
                 .Where(x => x.Device!.StatusCode == GlobalStatusCode.Active)
                 .ToListAsync();
         }

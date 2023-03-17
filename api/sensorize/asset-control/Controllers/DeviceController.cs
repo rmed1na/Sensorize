@@ -41,8 +41,13 @@ namespace AssetControl.Api.Controllers
             if (string.IsNullOrWhiteSpace(request.Name))
                 return BadRequest("Name can't be null or empty");
             if (request.MeasureTypeCode == MeasureTypeCode.Unknown)
-                return BadRequest("Meausre code must be defined");
-            // TODO: Validate topic is unique
+                return BadRequest("Measure code must be defined");
+            if (string.IsNullOrWhiteSpace(request.Topic))
+                return BadRequest("Topic is required");
+
+            var topicDevice = await _deviceRepository.GetAsync(request.Topic);
+            if (topicDevice != null)
+                return Conflict($"Device with topic {request.Topic} already exists");
 
             var device = new Device
             {
@@ -50,8 +55,15 @@ namespace AssetControl.Api.Controllers
                 MeasureTypeCode = request.MeasureTypeCode,
                 StatusCode = GlobalStatusCode.Active,
                 Topic = request.Topic,
-                Channel = request.Channel
+                Channel = request.Channel,
+                HasAlert = request.HasAlert
             };
+
+            if (request.HasAlert)
+            {
+                device.AlertMinRatio = request.AlertMinLevel / 100;
+                device.AlertMaxRatio = request.AlertMaxLevel / 100;
+            }
 
             if (request.MeasureProperties != null && request.MeasureProperties.Any())
             {
@@ -100,6 +112,19 @@ namespace AssetControl.Api.Controllers
                 }
             }
 
+            if (request.HasAlert)
+            {
+                device.HasAlert = true;
+                device.AlertMinRatio = request.AlertMinLevel / 100;
+                device.AlertMaxRatio = request.AlertMaxLevel / 100;
+            }
+            else
+            {
+                device.HasAlert = false;
+				device.AlertMinRatio = null;
+				device.AlertMaxRatio = null;
+            }
+
             await _deviceRepository.SaveAsync(device);
             return Ok(new DeviceDto(device));
         }
@@ -130,61 +155,6 @@ namespace AssetControl.Api.Controllers
                 cycles++;
 				await Task.Delay(5_000);
 			}
-        }
-
-
-        [HttpGet]
-        [Route("statuses")]
-        [Obsolete]
-        public async Task GetDevicesStatusesAsync()
-        {
-            var response = Response;
-            response.Headers.Add("Content-Type", "text/event-stream");
-
-            var devices = await _deviceRepository.GetAllAsync();
-
-            foreach (var device in devices.Where(d => d.Channel != null))
-            {
-                var key = $"{DeviceStatusListener.StreamKey}.{device.Topic}";
-                var rawData = _cache.Get<string>(key);
-                if (rawData == null)
-                    continue;
-
-                _cache.Remove(key);
-
-                var data = JsonSerializer.Deserialize<Dictionary<string, object>>(rawData);
-                if (data == null)
-                    continue;
-
-                data.TryGetValue(device.Channel!, out object? measurementObj);
-
-                if (measurementObj == null)
-                    continue;
-
-                var measurementStr = measurementObj.ToString();
-                if (!string.IsNullOrEmpty(measurementStr) && double.TryParse(measurementStr, out double measurement))
-                {
-                    //var status = new DeviceStatusDto(device, measurement);
-                    var status = DeviceStateHandler.ComputeMeasurement(device, measurement);
-                    var statusJson = JsonSerializer.Serialize(status, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    });
-
-                    await response.WriteAsync($"data: {statusJson}\n\n");
-					await response.Body.FlushAsync();
-					await Task.Delay(500);
-				}
-            }
-        }
-
-
-        [HttpGet]
-        [Route("all")]
-        public async Task<ICollection<DeviceOld>> GetDevicesAsync()
-        {
-            return _tempDevices;
         }
 
         [HttpGet]
@@ -260,18 +230,6 @@ namespace AssetControl.Api.Controllers
             //        await Task.Delay(500);
             //    }
             //}
-        }
-
-        [HttpGet]
-        [Route("{deviceId:Guid}/status_x")]
-        public async Task<IActionResult> GetDeviceStatusAsync(Guid deviceId)
-        {
-            var device = _tempDevices.FirstOrDefault(x => x.DeviceId == deviceId);
-            if (device == null)
-                return NotFound("Device not found");
-
-            //var status = GetDeviceStatusInternal(device);
-            return Ok();
         }
     }
 }

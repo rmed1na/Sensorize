@@ -17,7 +17,14 @@ import {
     AccordionPanel,
     Heading,
     useToast,
-    Checkbox
+    Checkbox,
+    Slider,
+    SliderMark,
+    SliderTrack,
+    SliderFilledTrack,
+    SliderThumb,
+    Switch,
+    Tooltip
 } from "@chakra-ui/react";
 // Chakra select
 import { Select as ChakraSelect, chakraComponents } from 'chakra-react-select';
@@ -61,6 +68,34 @@ export default function DeviceDetails({
     const handleTopicChange = (e) => setDevice({ ...device, topic: e.target.value });
     const handleChannelChange = (e) => setDevice({ ...device, channel: e.target.value });
     const handleNameChange = (e) => setDevice({ ...device, name: e.target.value });
+    const handleHasAlertChange = (e) => {
+        if (!device?.measureTypeCode)
+        {
+            toast({
+                title: 'Missing device type',
+                description: 'Please select a device type so that alert properties can be properly choosen',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+                position: 'top'
+            });
+            return;
+        }
+
+        setDevice({ ...device, hasAlert: e.target.checked })
+    };
+    const handleAlertLevel = (e, bound) => {
+        switch (bound) {
+            case 'min':
+                setDevice({ ...device, alertMinLevel: e });
+                break;
+            case 'max':
+                setDevice({ ...device, alertMaxLevel: e });
+                break;
+            default:
+                break;
+        }
+    }
     const handleMeasurePropChange = (code, value) => {
         let exists = false;
         let updatedProps = device.measureProperties.map(p => {
@@ -149,6 +184,7 @@ export default function DeviceDetails({
 
         return '';
     };
+
     const measureTypeDetails = () => {
         let component;
         switch (device?.measureTypeCode) {
@@ -172,6 +208,41 @@ export default function DeviceDetails({
             case 2: // Temperature
                 break;
             default: // Empty
+                break;
+        }
+
+        return component;
+    }
+
+    const alertTypeDetails = () => {
+        let component;
+        switch (device?.measureTypeCode) {
+            case 1: // Volume
+                component = (
+                    <FormControl py={2}>
+                        <FormLabel>Nivel de alerta: {device?.alertMinLevel ?? '10'}%</FormLabel>
+                        <Slider
+                            defaultValue={device?.alertMinLevel ?? 10}
+                            min={0}
+                            max={100}
+                            step={1}
+                            onChange={e => handleAlertLevel(e, 'min')}>
+                            <SliderMark mt={1} ml='-2.5' value={10}>10%</SliderMark>
+                            <SliderMark mt={1} ml='-2.5' value={25}>25%</SliderMark>
+                            <SliderMark mt={1} ml='-2.5' value={50}>50%</SliderMark>
+                            <SliderMark mt={1} ml='-2.5' value={75}>75%</SliderMark>
+                            <SliderMark></SliderMark>
+                            <SliderTrack>
+                                <SliderFilledTrack />
+                            </SliderTrack>
+                            <SliderThumb />
+                        </Slider>
+                    </FormControl>
+                );
+                break;
+            case 2: // Temperature
+                break;
+            default:
                 break;
         }
 
@@ -269,6 +340,24 @@ export default function DeviceDetails({
                         {measureTypeDetails()}
                     </AccordionPanel>
                 </AccordionItem>
+
+                {/* Alert */}
+                <AccordionItem>
+                    <AccordionButton>
+                        <Flex justify="space-between" w="full">
+                            <Heading as="h4" fontWeight={500}>Alerta</Heading>
+                            <AccordionIcon />
+                        </Flex>
+                    </AccordionButton>
+                    <AccordionPanel>
+                        <FormControl py={2} display='flex'>
+                            <FormLabel>Tiene alerta?</FormLabel>
+                            <Switch onChange={e => handleHasAlertChange(e)} isChecked={device?.hasAlert} />
+                        </FormControl>
+                        {device?.hasAlert && alertTypeDetails()}
+                    </AccordionPanel>
+                </AccordionItem>
+
             </Accordion>
             <Flex gap={2} justify="flex-end" my={5}>
                 <Button size="sm" onClick={upsert}>Guardar</Button>

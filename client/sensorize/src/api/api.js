@@ -22,7 +22,10 @@ async function createDevice(device, successCallback = null, errorCallback = null
             topic: device.topic,
             measureTypeCode: device.measureTypeCode,
             measureProperties: device.measureProperties,
-            channel: device.channel
+            channel: device.channel,
+            hasAlert: device.hasAlert,
+            alertMinLevel: device.alertMinLevel,
+            alertMaxLevel: device.alertMaxLevel
         })
     });
 
@@ -55,7 +58,10 @@ async function updateDevice(device, callBack = null) {
             topic: device.topic,
             channel: device.channel,
             measureTypeCode: device.measureTypeCode,
-            measureProperties: device.measureProperties
+            measureProperties: device.measureProperties,
+            hasAlert: device.hasAlert,
+            alertMinLevel: device.alertMinLevel,
+            alertMaxLevel: device.alertMaxLevel
         })
     });
 

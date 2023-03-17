@@ -15,6 +15,9 @@ namespace Sensorize.Api.Models.Dto
 		public bool IsActive { get; set; }
 		public string? Topic { get; set; }
 		public string? Channel { get; set; }
+		public bool HasAlert { get; set; }
+		public double? AlertMinLevel { get; set; }
+		public double? AlertMaxLevel { get; set; }
 		public ICollection<MeasurePropertyDto> MeasureProperties { get; set; } = new List<MeasurePropertyDto>();
 
 		public DeviceDto() { }
@@ -36,6 +39,13 @@ namespace Sensorize.Api.Models.Dto
 				MeasureProperties = new List<MeasurePropertyDto>();
 				foreach (var mprop in device.MeasureProperties)
 					MeasureProperties.Add(new MeasurePropertyDto(mprop));
+			}
+
+			if (device.HasAlert)
+			{
+				HasAlert = device.HasAlert;
+				AlertMinLevel = device.AlertMinRatio * 100;
+				AlertMaxLevel = device.AlertMaxRatio * 100;
 			}
 		}
 	}

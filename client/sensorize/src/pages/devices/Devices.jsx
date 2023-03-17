@@ -14,7 +14,7 @@ import Navbar from "../../components/Navbar";
 import SideBar from "../../components/sidebar/SideBar";
 import api from "../../api/api";
 
-export default function DeviceConfig() {
+export default function Devices() {
     const [devices, setDevices] = useState([]);
     const [selectedDevice, setSelectedDevice] = useState();
 

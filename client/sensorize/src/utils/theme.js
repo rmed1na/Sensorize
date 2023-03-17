@@ -61,7 +61,14 @@ const theme = extendTheme({
     components: components
 }, withDefaultColorScheme({
     colorScheme: 'brand',
-    components: ['Button', 'Heading', 'InputLeftAddon', 'Checkbox']
+    components: [
+        'Button', 
+        'Heading', 
+        'InputLeftAddon', 
+        'Checkbox', 
+        'Slider', 
+        'Switch'
+    ]
 }));
 
 console.log('theme', theme);

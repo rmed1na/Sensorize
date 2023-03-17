@@ -11,7 +11,18 @@ namespace Sensorize.Domain.Models
         public MeasureTypeCode MeasureTypeCode { get; set; }
         public string? Topic { get; set; }
         public string? Channel { get; set; }
+        public bool HasAlert { get; set; }
+        public double? AlertMinRatio { get; set; }
+        public double? AlertMaxRatio { get; set; }
 
         public virtual ICollection<DeviceMeasureProperty>? MeasureProperties { get; set; }
+
+        public DeviceMeasureProperty? GetMeasureProperty(string name)
+        {
+            if (MeasureProperties != null && MeasureProperties.Any())
+                return MeasureProperties.FirstOrDefault(x => x.PropertyCode.ToLower() == name.ToLower());
+
+            return null;
+        }
     }
 }

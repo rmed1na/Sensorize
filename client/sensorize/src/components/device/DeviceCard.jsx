@@ -5,7 +5,6 @@ import {
     CardHeader,
     Heading,
     Text,
-    Box,
     Flex
 } from '@chakra-ui/react';
 
@@ -13,14 +12,14 @@ export default function DeviceCard({
     name,
     lastUpdate,
     isOnAlert,
-    stateDescription,
-    iconClassName
+    stateDescription
 }) {
-    let alertClass = isOnAlert == true ? "card--alert" : "";
-
     return (
         <>
-            <Card maxW="sm">
+            <Card 
+                maxW="sm" 
+                border={ isOnAlert ? '1px solid' : 'inherit' } 
+                borderColor={ isOnAlert ? 'red.500' : 'inherit' }>
                 <CardHeader pb={0} color="brand.700">
                     <Heading as="h4">{name}</Heading>
                 </CardHeader>
@@ -30,8 +29,16 @@ export default function DeviceCard({
                         <Text color="blackAlpha.700" fontWeight={600}>{lastUpdate}</Text>
                     </Flex>
                 </CardBody>
-                <CardFooter borderBottomRadius="md" bg="blackAlpha.100" py={3} fontWeight={500} color="blackAlpha.700">
-                    <Text w="full" textAlign="center">{stateDescription ? stateDescription : <span>&nbsp;</span>}</Text>
+                <CardFooter 
+                    borderBottomRadius="md" 
+                    bg={ isOnAlert ? 'red.500' : 'blackAlpha.100' }
+                    py={3} 
+                    fontWeight={500} 
+                    color="blackAlpha.700">
+                    <Text 
+                        w="full" 
+                        textAlign="center"
+                        color={ isOnAlert ? 'white' : 'inherit' }>{stateDescription ? stateDescription : <span>&nbsp;</span>}</Text>
                 </CardFooter>
             </Card>
         </>
