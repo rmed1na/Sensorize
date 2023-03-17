@@ -29,6 +29,14 @@ export default function SideBar() {
         {
             title: 'Dispositivos',
             icon: BiChip,
+            to: '/device'
+        }
+
+        /*
+        // For submenu items, use this structure
+        {
+            title: 'Dispositivos',
+            icon: BiChip,
             children: [
                 {
                     title: 'Dispositivos',
@@ -42,6 +50,7 @@ export default function SideBar() {
                 }
             ]
         }
+        */
     ]);
 
     return (

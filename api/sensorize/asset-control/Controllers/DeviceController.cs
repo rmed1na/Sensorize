@@ -17,22 +17,10 @@ namespace AssetControl.Api.Controllers
     public class DeviceController : ControllerBase
     {
         private readonly IDeviceRepository _deviceRepository;
-        private readonly IMemoryCache _cache;
-        private readonly List<DeviceOld> _tempDevices = new()
-        {
-            new DeviceOld { DeviceId = Guid.Parse("4dcb7421-6e6f-411a-a56b-7fdcd655086b"), Name = "Puerta 1", Type = DeviceTypeCode.Binary, Channel = "do1" },
-            new DeviceOld { DeviceId = Guid.Parse("22ddaecc-780c-45fa-8fea-12e12821f3f6"), Name = "Puerta 2", Type = DeviceTypeCode.Binary, Channel = "do2" },
-            new DeviceOld { DeviceId = Guid.Parse("cde376af-8072-4edc-811b-f02ca86e88a1"), Name = "A/C 1", Type = DeviceTypeCode.Temperature, Channel = "ai1" },
-            new DeviceOld { DeviceId = Guid.Parse("c4e14e7a-8da4-4c5c-81fb-6c9dcbc827bc"), Name = "A/C 2", Type = DeviceTypeCode.Temperature, Channel = "ai2" },
-            new DeviceOld { DeviceId = Guid.Parse("741c8960-c20f-4f23-837d-80f453aab884"), Name = "A/C 3", Type = DeviceTypeCode.Temperature, Channel = "ai3" }
-        };
 
-        public DeviceController(
-            IDeviceRepository deviceRepository,
-            IMemoryCache cache)
+        public DeviceController(IDeviceRepository deviceRepository)
         {
             _deviceRepository = deviceRepository;
-            _cache = cache;
         }
 
         [HttpPost]
@@ -155,81 +143,6 @@ namespace AssetControl.Api.Controllers
                 cycles++;
 				await Task.Delay(5_000);
 			}
-        }
-
-        [HttpGet]
-        [Route("stream/statuses")]
-        public async Task GetDeviceStatusesStreamAsync()
-        {
-            /*
-            var response = Response;
-            response.Headers.Add("Content-Type", "text/event-stream");
-
-            var jsonOpt = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            foreach (var device in _tempDevices)
-            {
-                var status = GetDeviceStatusInternal(device);
-                if (status == null)
-                    continue;
-
-                var data = $"data: {JsonSerializer.Serialize(status, jsonOpt)}\n\n";
-                await response.WriteAsync(data);
-                await response.Body.FlushAsync();
-            }*/
-            //const string Key = "mqtt-stream";
-            //var items = _cache.Get<List<string>>(Key) ?? new List<string>();
-            //_cache.Remove(Key);
-
-            //foreach (var item in items)
-            //{
-            //    var status = JsonSerializer.Deserialize<DeviceStatus>(item, jsonOpt);
-            //    var device = _tempDevices.FirstOrDefault(d => d.DeviceId == status?.DeviceId);
-            //    if (status != null && device != null)
-            //    {
-            //        switch (device.Type)
-            //        {
-            //            case DeviceTypeCode.Binary:
-            //                if (status.Measure == 1)
-            //                {
-            //                    status.IsOnAlert = true;
-            //                    status.Description = "Abierta";
-            //                    status.IconClass = "fa-solid fa-door-open";
-            //                }
-            //                else if (status.Measure == 0)
-            //                {
-            //                    status.IsOnAlert = false;
-            //                    status.Description = "Cerrada";
-            //                    status.IconClass = "fa-solid fa-door-closed";
-            //                }
-            //                break;
-            //            case DeviceTypeCode.Temperature:
-            //                status.Description = status.Measure.ToString();
-            //                if (status.Measure >= 100)
-            //                {
-            //                    status.IsOnAlert = true;
-            //                    status.IconClass = "fa-solid fa-temperature-arrow-up";
-            //                }
-            //                else
-            //                {
-            //                    status.IsOnAlert = false;
-            //                    status.IconClass = "fa-solid fa-temperature-arrow-down";
-            //                }
-            //                break;
-            //            default:
-            //                break;
-            //        }
-
-            //        var data = $"data: {JsonSerializer.Serialize(status, jsonOpt)}\n\n";
-            //        await response.WriteAsync(data);
-            //        await response.Body.FlushAsync();
-            //        await Task.Delay(500);
-            //    }
-            //}
         }
     }
 }
