@@ -31,6 +31,7 @@ import theme from './utils/theme'
 import App from './App'
 import Home from './pages/home/Home'
 import Devices from './pages/devices/Devices'
+import NotificationGroups from './pages/notifications/Groups';
 
 // CSS
 import './index.css'
@@ -45,6 +46,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path='/login' element={<App />} />
           <Route path='/home' element={<Home />} />
           <Route path='/device' element={<Devices />} />
+          <Route path='/notification/group' element={<NotificationGroups />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

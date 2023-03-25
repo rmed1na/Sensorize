@@ -38,6 +38,13 @@ namespace Sensorize.Repository
                 e.Property(x => x.DeviceStateId).UseMySQLAutoIncrementColumn("int");
                 e.HasOne(x => x.Device).WithMany().HasForeignKey(x => x.DeviceId);
             });
+
+            builder.Entity<NotificationGroup>(e =>
+            {
+                e.ToTable("notification_groups");
+                e.HasKey(x => x.NotificationGroupId);
+                e.Property(x => x.NotificationGroupId).UseMySQLAutoIncrementColumn("int");
+            });
         }
     }
 }

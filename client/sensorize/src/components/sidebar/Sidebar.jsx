@@ -13,7 +13,9 @@ import {
 import { BiChip } from 'react-icons/bi';
 import { RxDashboard } from 'react-icons/rx';
 import { 
-    MdDeviceThermostat
+    MdDeviceThermostat,
+    MdNotificationsNone,
+    MdOutlineGroup
 } from 'react-icons/md';
 
 // CC
@@ -30,8 +32,18 @@ export default function SideBar() {
             title: 'Dispositivos',
             icon: BiChip,
             to: '/device'
+        },
+        {
+            title: 'Notificaciones',
+            icon: MdNotificationsNone,
+            children: [
+                {
+                    title: 'Grupos',
+                    icon: MdOutlineGroup,
+                    to: '/notification/group'
+                }
+            ]
         }
-
         /*
         // For submenu items, use this structure
         {

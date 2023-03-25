@@ -1,5 +1,88 @@
 const API_BASE_URL = 'https://localhost:7168/api';
 
+const resource = {
+    notification: {
+        group: {
+            create: async function (group, successCallback = null, errorCallback = null) {
+                const response = await fetch(`${API_BASE_URL}/notification/group`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(group.name)
+                });
+            
+                if (response.ok) {
+                    const data = await response.json();
+            
+                    if (successCallback != null)
+                        successCallback();
+            
+                    return data;
+                } else {
+                    let message = await response.text();
+                    if (errorCallback != null)
+                        errorCallback(message);
+                }
+            },
+            update: async function (group, successCallback = null, errorCallback = null) {
+                const response = await fetch(`${API_BASE_URL}/notification/group/${group.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(group.name)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (successCallback != null)
+                        successCallback();
+
+                    return data;
+                } else {
+                    let message = await response.text();
+                    if (errorCallback != null)
+                        errorCallback(message);
+                }
+            },
+            getAll: async function () {
+                const response = await fetch(`${API_BASE_URL}/notification/group`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data;
+                } else {
+                    throwError(response);
+                }
+            },
+            delete: async function (group, successCallback = null, errorCallback = null) {
+                const response = await fetch(`${API_BASE_URL}/notification/group/${group.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (successCallback != null)
+                        successCallback();
+
+                    return data;
+                } else {
+                    let message = await response.text();
+                    if (errorCallback != null)
+                        errorCallback(message);
+                }
+            }
+        }
+    }
+}
+
+// DEVICES
 async function getDevices() {
     const response = await fetch(`${API_BASE_URL}/device`)
     
@@ -90,5 +173,6 @@ export default {
     getDevices,
     getStatusEventSource,
     createDevice,
-    updateDevice
+    updateDevice,
+    resource
 }

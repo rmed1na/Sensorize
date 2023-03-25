@@ -9,6 +9,7 @@ namespace Sensorize.Repository.Context
         DbSet<DeviceType> DeviceTypes { get; }
         DbSet<DeviceMeasureProperty> DeviceMeasureProperties { get; }
         DbSet<DeviceState> DeviceStates { get; }
+        DbSet<NotificationGroup> NotificationGroups { get; }
 
         Task ReloadAsync<T>(T entity);
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

@@ -26,7 +26,11 @@ export default function DeviceListItem({
     }
 
     return (
-        <Card mx={3} my={2} bg="blackAlpha.100" onClick={() => onClick(device)}>
+        <Card 
+            mx={3} 
+            my={2} 
+            bg="blackAlpha.100"
+            onClick={() => onClick(device)}>
             <CardHeader pt={3.5} pb={0.5}>
                 <Heading as="h4" color="brand.600">{device.name}</Heading>
             </CardHeader>

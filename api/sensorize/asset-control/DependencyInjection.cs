@@ -11,6 +11,7 @@ namespace Sensorize.Api
             services.AddScoped<ISensorizeContext, SensorizeContext>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
             services.AddScoped<IDeviceTypeRepository, DeviceTypeRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
             #endregion
         }
     }
