@@ -9,6 +9,8 @@ namespace Sensorize.Domain.Models
         public string Name { get; set; } = string.Empty;
         public GlobalStatusCode StatusCode { get; set; }
 
+        public virtual ICollection<NotificationRecipient>? Recipients { get; set; }
+
         public NotificationGroup()
         {
             StatusCode = GlobalStatusCode.Active;

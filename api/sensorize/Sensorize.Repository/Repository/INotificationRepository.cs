@@ -9,6 +9,11 @@ namespace Sensorize.Repository.Repository
         Task<NotificationGroup?> GetGroupAsync(string name);
         Task<NotificationGroup?> GetGroupAsync(int groupId);
         Task<ICollection<NotificationGroup>> GetGroupsAsync();
+
+        Task AddRecipientAsync(NotificationRecipient recipient);
+        Task<ICollection<NotificationRecipient>> GetRecipientsAsync();
+        Task<NotificationRecipient?> GetRecipientAsync(int recipientId);
+
         Task SaveAsync(BaseModel model);
     }
 }

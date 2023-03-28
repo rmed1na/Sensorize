@@ -79,16 +79,16 @@ export default function Groups() {
         };
 
         if (isNew)
-            await api.resource.notification.group.create(selectedGroup, successCallback, errorCallback);
+            await api.resources.notification.group.create(selectedGroup, successCallback, errorCallback);
         else
-            await api.resource.notification.group.update(selectedGroup, successCallback, errorCallback);
+            await api.resources.notification.group.update(selectedGroup, successCallback, errorCallback);
         
         onModalClose();
         loadGroups();
     }
 
     async function loadGroups() {
-        const groups = await api.resource.notification.group.getAll();
+        const groups = await api.resources.notification.group.getAll();
         setGroups(groups);
     }
 
@@ -103,7 +103,7 @@ export default function Groups() {
     }
 
     async function handleGroupDeletion(group) {
-        await api.resource.notification.group.delete(
+        await api.resources.notification.group.delete(
             group,
             function () {
                 toast({
@@ -125,6 +125,8 @@ export default function Groups() {
                 });
             }
         );
+
+        loadGroups();
     }
 
     useEffect(() => {
@@ -147,7 +149,6 @@ export default function Groups() {
                             <Button
                                 leftIcon={<MdAdd />}
                                 boxShadow="none"
-                                variant="solid"
                                 size="sm"
                                 onClick={handleNewGroupClick}
                             >Agregar nuevo
@@ -203,17 +204,26 @@ export default function Groups() {
                                                 { group.isActive && 
                                                     <HStack>
                                                         <Tooltip label="Editar">
-                                                            <Button size="md" boxShadow="none" variant="ghost" onClick={() => handleGroupSelection(group)}>
+                                                            <Button 
+                                                                size="sm" 
+                                                                boxShadow="none" 
+                                                                variant="ghost" 
+                                                                onClick={() => handleGroupSelection(group)}>
                                                                 <MdEdit />
                                                             </Button>
                                                         </Tooltip>
-                                                        
                                                         <Tooltip label="Eliminar">
-                                                            <Button size="md" boxShadow="none" variant="ghost" color="red.600" onClick={() => handleGroupDeletion(group)}>
+                                                            <Button 
+                                                                size="sm" 
+                                                                boxShadow="none" 
+                                                                variant="ghost" 
+                                                                color="red.600" 
+                                                                onClick={() => handleGroupDeletion(group)}>
                                                                 <MdDelete />
                                                             </Button>
                                                         </Tooltip> 
-                                                    </HStack> }
+                                                    </HStack> 
+                                                }
                                                 </Td>
                                             </Tr>);
                                     })}

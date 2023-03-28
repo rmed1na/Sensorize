@@ -18,6 +18,7 @@ namespace Sensorize.Api.Models.Dto
 		public bool HasAlert { get; set; }
 		public double? AlertMinLevel { get; set; }
 		public double? AlertMaxLevel { get; set; }
+		public int? NotificationGroupId { get; set; }
 		public ICollection<MeasurePropertyDto> MeasureProperties { get; set; } = new List<MeasurePropertyDto>();
 
 		public DeviceDto() { }
@@ -33,6 +34,7 @@ namespace Sensorize.Api.Models.Dto
 			IsActive = device.StatusCode == GlobalStatusCode.Active;
 			Topic = device.Topic;
 			Channel = device.Channel;
+			NotificationGroupId = device.NotificationGroupId;
 
 			if (device.MeasureProperties != null && device.MeasureProperties.Any())
 			{

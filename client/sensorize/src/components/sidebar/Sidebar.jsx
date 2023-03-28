@@ -15,7 +15,8 @@ import { RxDashboard } from 'react-icons/rx';
 import { 
     MdDeviceThermostat,
     MdNotificationsNone,
-    MdOutlineGroup
+    MdOutlineGroup,
+    MdOutlineRecordVoiceOver
 } from 'react-icons/md';
 
 // CC
@@ -41,6 +42,11 @@ export default function SideBar() {
                     title: 'Grupos',
                     icon: MdOutlineGroup,
                     to: '/notification/group'
+                },
+                {
+                    title: 'Destinatarios',
+                    icon: MdOutlineRecordVoiceOver,
+                    to: '/notification/recipient'
                 }
             ]
         }

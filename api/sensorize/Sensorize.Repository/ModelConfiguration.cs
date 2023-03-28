@@ -14,6 +14,7 @@ namespace Sensorize.Repository
                 e.HasKey(x => x.DeviceId);
                 e.Property(x => x.DeviceId).UseMySQLAutoIncrementColumn("int");
                 e.HasMany(x => x.MeasureProperties).WithOne(x => x.Device);
+                e.HasOne(x => x.NotificationGroup).WithMany().HasForeignKey(x => x.NotificationGroupId);
             });
 
             builder.Entity<DeviceType>(e =>
@@ -44,6 +45,14 @@ namespace Sensorize.Repository
                 e.ToTable("notification_groups");
                 e.HasKey(x => x.NotificationGroupId);
                 e.Property(x => x.NotificationGroupId).UseMySQLAutoIncrementColumn("int");
+            });
+
+            builder.Entity<NotificationRecipient>(e =>
+            {
+                e.ToTable("notification_recipients");
+                e.HasKey(x => x.NotificationRecipientId);
+                e.Property(x => x.NotificationRecipientId).UseMySQLAutoIncrementColumn("int");
+                e.HasOne(x => x.Group).WithMany(x => x.Recipients).HasForeignKey(x => x.GroupId);
             });
         }
     }

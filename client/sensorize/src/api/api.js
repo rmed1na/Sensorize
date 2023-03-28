@@ -1,6 +1,49 @@
 const API_BASE_URL = 'https://localhost:7168/api';
 
-const resource = {
+const resources = {
+    device: {
+        getAll: async function () {
+            const response = await fetch(`${API_BASE_URL}/device`)
+
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                throwError(response);
+            }
+        },
+        update: async function (device, callBack = null) {
+            const response = await fetch(`${API_BASE_URL}/device/${device.deviceId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: device.name,
+                    topic: device.topic,
+                    channel: device.channel,
+                    measureTypeCode: device.measureTypeCode,
+                    measureProperties: device.measureProperties,
+                    hasAlert: device.hasAlert,
+                    alertMinLevel: device.alertMinLevel,
+                    alertMaxLevel: device.alertMaxLevel,
+                    notificationGroupId: device.notificationGroupId
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (callBack != null) {
+                    callBack();
+                }
+
+                return data;
+            } else {
+                throwError(response);
+            }
+        }
+    },
     notification: {
         group: {
             create: async function (group, successCallback = null, errorCallback = null) {
@@ -11,13 +54,13 @@ const resource = {
                     },
                     body: JSON.stringify(group.name)
                 });
-            
+
                 if (response.ok) {
                     const data = await response.json();
-            
+
                     if (successCallback != null)
                         successCallback();
-            
+
                     return data;
                 } else {
                     let message = await response.text();
@@ -78,6 +121,94 @@ const resource = {
                         errorCallback(message);
                 }
             }
+        },
+        recipient: {
+            create: async function (recipient, successCallback = null, errorCallback = null) {
+                const response = await fetch(`${API_BASE_URL}/notification/recipient`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        firstName: recipient.firstName,
+                        lastName: recipient.lastName,
+                        email: recipient.email,
+                        groupId: recipient.groupId
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (successCallback != null)
+                        successCallback();
+
+                    return data;
+                } else {
+                    let message = await response.text();
+                    if (errorCallback != null)
+                        errorCallback(message);
+                }
+            },
+            getAll: async function () {
+                const response = await fetch(`${API_BASE_URL}/notification/recipient`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data;
+                } else {
+                    throwError(response);
+                }
+            },
+            update: async function (recipient, successCallback = null, errorCallback = null) {
+                const response = await fetch(`${API_BASE_URL}/notification/recipient/${recipient.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        firstName: recipient.firstName,
+                        lastName: recipient.lastName,
+                        email: recipient.email,
+                        groupId: recipient.groupId
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (successCallback != null)
+                        successCallback();
+
+                    return data;
+                } else {
+                    let message = await response.text();
+                    if (errorCallback != null)
+                        errorCallback(message);
+                }
+            },
+            delete: async function (recipient, successCallback = null, errorCallback = null) {
+                const response = await fetch(`${API_BASE_URL}/notification/recipient/${recipient.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (successCallback != null)
+                        successCallback();
+                    
+                    return data;
+                } else {
+                    const message = await response.text();
+
+                    if (errorCallback != null)
+                        errorCallback(message);
+                }
+            }
         }
     }
 }
@@ -85,7 +216,7 @@ const resource = {
 // DEVICES
 async function getDevices() {
     const response = await fetch(`${API_BASE_URL}/device`)
-    
+
     if (response.ok) {
         const data = await response.json();
         return data;
@@ -118,7 +249,7 @@ async function createDevice(device, successCallback = null, errorCallback = null
         if (successCallback != null) {
             successCallback();
         }
-        
+
         return data;
     } else {
         let message = await response.text();
@@ -126,37 +257,6 @@ async function createDevice(device, successCallback = null, errorCallback = null
             errorCallback(message);
         }
 
-        throwError(response);
-    }
-}
-
-async function updateDevice(device, callBack = null) {
-    const response = await fetch(`${API_BASE_URL}/device/${device.deviceId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: device.name,
-            topic: device.topic,
-            channel: device.channel,
-            measureTypeCode: device.measureTypeCode,
-            measureProperties: device.measureProperties,
-            hasAlert: device.hasAlert,
-            alertMinLevel: device.alertMinLevel,
-            alertMaxLevel: device.alertMaxLevel
-        })
-    });
-
-    if (response.ok) {
-        const data = await response.json();
-
-        if (callBack != null) {
-            callBack();
-        }
-
-        return data;
-    } else {
         throwError(response);
     }
 }
@@ -173,6 +273,5 @@ export default {
     getDevices,
     getStatusEventSource,
     createDevice,
-    updateDevice,
-    resource
+    resources
 }

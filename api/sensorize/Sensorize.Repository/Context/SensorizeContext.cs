@@ -10,6 +10,7 @@ namespace Sensorize.Repository.Context
 		public DbSet<DeviceMeasureProperty> DeviceMeasureProperties => Set<DeviceMeasureProperty>();
 		public DbSet<DeviceState> DeviceStates => Set<DeviceState>();
 		public DbSet<NotificationGroup> NotificationGroups => Set<NotificationGroup>();
+		public DbSet<NotificationRecipient> NotificationRecipients => Set<NotificationRecipient>();
 
 		public SensorizeContext(DbContextOptions<SensorizeContext> options) : base(options) { }
 

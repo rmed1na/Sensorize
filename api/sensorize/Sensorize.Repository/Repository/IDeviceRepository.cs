@@ -1,4 +1,5 @@
 ﻿using Sensorize.Domain.Models;
+using Sensorize.Domain.Models.Meta;
 using Sensorize.Repository.Context;
 
 namespace Sensorize.Repository.Repository
@@ -13,6 +14,6 @@ namespace Sensorize.Repository.Repository
         Task<ICollection<Device>> GetAllAsync(bool onlyActive = true);
         Task<ICollection<DeviceState>> GetStatesAsync(bool onlyActive = true);
         Task UpsertState(DeviceState state);
-        Task SaveAsync(Device device);
+        Task SaveAsync(BaseModel device, bool setUpdateTime = true);
     }
 }

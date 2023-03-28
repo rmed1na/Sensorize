@@ -3,7 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Sensorize.Api;
 using Sensorize.Api.Models.AppSettings;
+using Sensorize.Api.Services;
 using Sensorize.Repository.Context;
+using System.Net;
+using System.Net.Mail;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +14,7 @@ var appSettings = builder.Configuration
     .GetSection("Application")
     .Get<ApiSettings>();
 
+#region Services
 // Add services to the container.
 builder.Services.AddSignalR();
 builder.Services
@@ -33,7 +37,24 @@ builder.Services.AddDbContext<SensorizeContext>(options =>
     options.UseMySQL(appSettings.DataSource.BuildMySqlConnectionString());
 }, ServiceLifetime.Transient);
 
+// Email
+builder.Services
+    .AddFluentEmail(appSettings.SystemEmail.Address, appSettings.SystemEmail.DisplayName)
+    .AddSmtpSender(new SmtpClient
+    {
+        Host = appSettings.SystemEmail.Host ?? string.Empty,
+        Port = appSettings.SystemEmail.Port,
+        EnableSsl = true,
+        DeliveryMethod = SmtpDeliveryMethod.Network,
+        Credentials = new NetworkCredential(appSettings.SystemEmail.Address, appSettings.SystemEmail.Password)
+    });
+
+// DI
 DependencyInjection.Configure(builder.Services);
+
+// Custom services
+builder.Services.AddHostedService<StateNotificationService>();
+#endregion
 
 var app = builder.Build();
 

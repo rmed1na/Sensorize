@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sensorize.Domain.Enums;
 using Sensorize.Domain.Models;
+using Sensorize.Domain.Models.Meta;
 using Sensorize.Repository.Context;
 
 namespace Sensorize.Repository.Repository
@@ -40,8 +41,8 @@ namespace Sensorize.Repository.Repository
         public async Task<ICollection<DeviceState>> GetStatesAsync(bool onlyActive = true)
         {
             return await _ctx.DeviceStates
-                .Include(x => x.Device)
                 .Include(x => x.Device!.MeasureProperties)
+                .Include(x => x.Device!.NotificationGroup.Recipients)
                 .Where(x => x.Device!.StatusCode == GlobalStatusCode.Active)
                 .ToListAsync();
         }
@@ -62,9 +63,10 @@ namespace Sensorize.Repository.Repository
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task SaveAsync(Device device)
+        public async Task SaveAsync(BaseModel device, bool setUpdateTime = true)
         {
-            device.SetUpdated();
+            if (setUpdateTime)
+                device.SetUpdated();
             await _ctx.SaveChangesAsync();
         }
     }

@@ -2,6 +2,7 @@
 using MQTTnet;
 using MQTTnet.Client;
 using Sensorize.Api.Controllers.Handlers;
+using Sensorize.Api.Helpers.Email;
 using Sensorize.Repository.Repository;
 using System.Text.Json;
 
@@ -32,18 +33,18 @@ namespace AssetControl.Api.EventListeners
             if (devices == null || !devices.Any())
             {
                 Console.WriteLine("No devices to subscribe to");
-				return;
-			}
+                return;
+            }
 
-			// TODO: Replace localhost with db value
-			await _mqttClient.ConnectAsync(BuildMqttClient("localhost"), CancellationToken.None);
+            // TODO: Replace localhost with db value
+            await _mqttClient.ConnectAsync(BuildMqttClient("localhost"), CancellationToken.None);
             _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
                 var device = await _deviceRepository.GetAsync(e.ApplicationMessage.Topic);
 
                 if (device != null)
                 {
-					var data = JsonSerializer.Deserialize<Dictionary<string, object>>(e.ApplicationMessage.ConvertPayloadToString());
+                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(e.ApplicationMessage.ConvertPayloadToString());
                     if (data == null || !data.Any())
                         return;
 
@@ -57,11 +58,11 @@ namespace AssetControl.Api.EventListeners
                         var state = DeviceStateHandler.ComputeMeasurement(device, measurement);
                         await _deviceRepository.UpsertState(state);
                     }
-				}
+                }
             };
 
-			// TODO: Handle new subscriptions that may come in after startup (new added device)
-			foreach (var topic in devices.Where(d => d.Topic != null).Select(d => d.Topic))
+            // TODO: Handle new subscriptions that may come in after startup (new added device)
+            foreach (var topic in devices.Where(d => d.Topic != null).Select(d => d.Topic))
                 await SubscribeToTopicAsync(topic!);
         }
 

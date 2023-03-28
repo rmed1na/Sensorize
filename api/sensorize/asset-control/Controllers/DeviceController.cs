@@ -1,13 +1,10 @@
-﻿using AssetControl.Api.EventListeners;
-using AssetControl.Api.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Sensorize.Api.Controllers.Handlers;
+﻿using Microsoft.AspNetCore.Mvc;
+using Sensorize.Api.Helpers.Email;
 using Sensorize.Api.Models.Dto;
 using Sensorize.Domain.Enums;
 using Sensorize.Domain.Models;
-using Sensorize.Repository.Context;
 using Sensorize.Repository.Repository;
+using Sensorize.Utility.Extensions;
 using System.Text.Json;
 
 namespace AssetControl.Api.Controllers
@@ -16,11 +13,16 @@ namespace AssetControl.Api.Controllers
     [ApiController]
     public class DeviceController : ControllerBase
     {
+        private const int MAX_MINUTES_WAIT_TO_ALERT = 5;
         private readonly IDeviceRepository _deviceRepository;
+        private readonly IEmailSender _emailSender;
 
-        public DeviceController(IDeviceRepository deviceRepository)
+        public DeviceController(
+            IDeviceRepository deviceRepository,
+            IEmailSender emailSender)
         {
             _deviceRepository = deviceRepository;
+            _emailSender = emailSender;
         }
 
         [HttpPost]
@@ -44,7 +46,8 @@ namespace AssetControl.Api.Controllers
                 StatusCode = GlobalStatusCode.Active,
                 Topic = request.Topic,
                 Channel = request.Channel,
-                HasAlert = request.HasAlert
+                HasAlert = request.HasAlert,
+                NotificationGroupId = request.NotificationGroupId,
             };
 
             if (request.HasAlert)
@@ -83,6 +86,7 @@ namespace AssetControl.Api.Controllers
             device.Topic = request.Topic;
             device.Channel = request.Channel;
             device.MeasureTypeCode = request.MeasureTypeCode;
+            device.NotificationGroupId = request.NotificationGroupId;
 
             if (request.MeasureProperties != null && request.MeasureProperties.Any())
             {
@@ -109,8 +113,8 @@ namespace AssetControl.Api.Controllers
             else
             {
                 device.HasAlert = false;
-				device.AlertMinRatio = null;
-				device.AlertMaxRatio = null;
+                device.AlertMinRatio = null;
+                device.AlertMaxRatio = null;
             }
 
             await _deviceRepository.SaveAsync(device);
@@ -125,8 +129,8 @@ namespace AssetControl.Api.Controllers
             var response = Response;
             response.Headers.Add("Content-Type", "text/event-stream");
 
-			var deviceStates = await _deviceRepository.GetStatesAsync();
-			var jsonOptions = new JsonSerializerOptions
+            var deviceStates = await _deviceRepository.GetStatesAsync();
+            var jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -137,12 +141,14 @@ namespace AssetControl.Api.Controllers
                 foreach (var state in deviceStates)
                 {
                     await _deviceRepository.Context.ReloadAsync(state);
-					await response.WriteAsync($"data: {JsonSerializer.Serialize(new DeviceStateDto(state), jsonOptions)}\n\n");
-					await response.Body.FlushAsync();
-				}
+                    var dto = new DeviceStateDto(state);
+
+                    await response.WriteAsync($"data: {JsonSerializer.Serialize(dto, jsonOptions)}\n\n");
+                    await response.Body.FlushAsync();
+                }
                 cycles++;
-				await Task.Delay(5_000);
-			}
+                await Task.Delay(5_000);
+            }
         }
     }
 }

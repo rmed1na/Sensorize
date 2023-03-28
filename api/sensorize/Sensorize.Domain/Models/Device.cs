@@ -14,8 +14,10 @@ namespace Sensorize.Domain.Models
         public bool HasAlert { get; set; }
         public double? AlertMinRatio { get; set; }
         public double? AlertMaxRatio { get; set; }
+        public int? NotificationGroupId { get; set; }
 
         public virtual ICollection<DeviceMeasureProperty>? MeasureProperties { get; set; }
+        public virtual NotificationGroup? NotificationGroup { get; set; }
 
         public DeviceMeasureProperty? GetMeasureProperty(string name)
         {
