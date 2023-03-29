@@ -1,24 +1,21 @@
 // React
 import { useState } from 'react';
-
 // Chakra
-import { 
-    Box, 
-    Flex, 
-    Heading, 
+import {
+    Box,
+    Flex,
+    Heading,
     Stack,
-    useColorModeValue } from '@chakra-ui/react';
-
+    useColorModeValue
+} from '@chakra-ui/react';
 // Icons
 import { BiChip } from 'react-icons/bi';
 import { RxDashboard } from 'react-icons/rx';
-import { 
-    MdDeviceThermostat,
+import {
     MdNotificationsNone,
     MdOutlineGroup,
     MdOutlineRecordVoiceOver
 } from 'react-icons/md';
-
 // CC
 import SideBarItem from './SideBarItem';
 
@@ -50,25 +47,6 @@ export default function SideBar() {
                 }
             ]
         }
-        /*
-        // For submenu items, use this structure
-        {
-            title: 'Dispositivos',
-            icon: BiChip,
-            children: [
-                {
-                    title: 'Dispositivos',
-                    icon: BiChip,
-                    to: '/device'
-                },
-                {
-                    title: 'Tipo',
-                    icon: MdDeviceThermostat,
-                    to: '/device/type'
-                }
-            ]
-        }
-        */
     ]);
 
     return (
@@ -91,11 +69,11 @@ export default function SideBar() {
                     <Stack mx="0.25rem">
                         {navItems.map((i) => {
                             return <SideBarItem
-                                        key={i.title}
-                                        title={i.title} 
-                                        to={i.to} 
-                                        icon={i.icon}
-                                        children={i.children} />
+                                key={i.title}
+                                title={i.title}
+                                to={i.to}
+                                icon={i.icon}
+                                children={i.children} />
                         })}
                     </Stack>
                 </Flex>

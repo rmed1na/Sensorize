@@ -15,7 +15,7 @@ import { BiChip } from 'react-icons/bi';
 import { CgDanger } from 'react-icons/cg';
 import { MdOutlineSync } from 'react-icons/md';
 // CC
-import DeviceCard from '../device/DeviceCard';
+import DeviceStateCard from '../device/DeviceStateCard';
 import api from '../../api/api';
 import dateUtil from '../../utils/dateUtil';
 
@@ -93,7 +93,7 @@ export default function Dashboard() {
                 <SimpleGrid columns={5} spacing={2}>
                     {devices && devices.map(d => {
                         let status = deviceStates.find(s => s.device.deviceId == d.deviceId);
-                        return <DeviceCard 
+                        return <DeviceStateCard 
                                     key={d.deviceId} 
                                     name={d.name}
                                     lastUpdate={status?.timeSpanDescription}

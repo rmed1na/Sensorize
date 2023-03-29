@@ -54,7 +54,7 @@ builder.Services
 DependencyInjection.Configure(builder.Services);
 
 // Custom services
-builder.Services.AddHostedService<StateNotificationService>();
+builder.Services.AddHostedService<DeviceStateNotificationService>();
 #endregion
 
 var app = builder.Build();

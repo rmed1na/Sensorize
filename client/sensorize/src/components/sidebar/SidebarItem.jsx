@@ -22,30 +22,32 @@ export default function SideBarItem({
 }) {
     const location = useLocation();
 
-    function getSideBarLink(route, titleText, linkIcon, isSelected) {
+    function getSideBarLink(route, titleText, linkIcon, isSelected, isChild = false) {
         return (
-        <Link
-            key={titleText}
-            as={RouterLink}
-            to={route}
-            transition="all 0.2s"
-            borderRadius="md"
-            style={{ textDecoration: 'none' }}>
-            <Flex
-                align="center"
-                p={2}
-                cursor="pointer"
-                gap={2}
-                color={isSelected ? '#fff' : 'blackAlpha.700'}
-                bg={isSelected ? 'brand.600' : 'inherit'}
+            <Link
+                key={titleText}
+                as={RouterLink}
+                to={route}
+                transition="all 0.2s"
                 borderRadius="md"
-                _hover={{ color: (isSelected ? useColorModeValue('brand.700') : 'inherit'), bg: useColorModeValue('brand.100') }}>
-                {linkIcon && (<Icon as={linkIcon} />)}
-                <Text fontSize="0.875rem" fontWeight={500}>{titleText}</Text>
-            </Flex>
-        </Link>)
+                style={{ textDecoration: 'none' }}>
+                <Flex
+                    align="center"
+                    p={2}
+                    cursor="pointer"
+                    gap={2}
+                    color={isSelected ? '#fff' : 'blackAlpha.700'}
+                    bg={isSelected ? 'brand.600' : 'inherit'}
+                    borderRadius="md"
+                    mb={ isChild ? 1 : 0 }
+                    height={ isChild ? '2rem' : 'initial' }
+                    _hover={{ color: (isSelected ? useColorModeValue('brand.700') : 'inherit'), bg: useColorModeValue('brand.100') }}>
+                    {linkIcon && (<Icon as={linkIcon} />)}
+                    <Text fontSize="0.875rem" fontWeight={500}>{titleText}</Text>
+                </Flex>
+            </Link>)
     }
-    
+
     if (children.length <= 0) {
         return getSideBarLink(to, title, icon, location.pathname == to);
     }
@@ -53,11 +55,11 @@ export default function SideBarItem({
     let anyChildrenSelected = children.findIndex(c => location.pathname == c.to) > -1;
 
     return (
-        <Accordion 
+        <Accordion
             allowToggle
             transition="all 0.2s"
             defaultIndex={anyChildrenSelected ? [0] : null}>
-            <AccordionItem 
+            <AccordionItem
                 border="none"
                 borderRadius="sm">
                 <AccordionButton color="blackAlpha.700" p={2}>
@@ -69,7 +71,7 @@ export default function SideBarItem({
                 </AccordionButton>
                 <AccordionPanel>
                     {children.map(c => {
-                        return getSideBarLink(c.to, c.title, c.icon, location.pathname == c.to)
+                        return getSideBarLink(c.to, c.title, c.icon, location.pathname == c.to, true)
                     })}
                 </AccordionPanel>
             </AccordionItem>

@@ -1,30 +1,32 @@
 import { Link as RouterLink } from 'react-router-dom';
 
 // Chakra
-import { Icon, Box, Flex, useColorModeValue, Button, Link, Heading } from '@chakra-ui/react';
+import { Icon, Box, Flex, useColorModeValue, Button, Link, Heading, Tooltip } from '@chakra-ui/react';
 
 // Icons
-import { RiLogoutCircleRLine } from 'react-icons/ri';
+import { MdLogout } from 'react-icons/md';
 
 export default function Navbar({
     title
 }) {
     return (
         <>
-            <Flex 
-                w="100%" 
+            <Flex
+                w="100%"
                 h="3rem"
                 borderBottom="1px"
                 borderBottomColor={useColorModeValue('gray.300', 'gray.700')}
                 align="center"
                 justify="space-between"
                 px={5}>
-                    <Heading as="h3" color="brand.700">{title}</Heading>
-                    <Link as={RouterLink} to='/login'>
+                <Heading as="h3" color="brand.700">{title}</Heading>
+                <Link as={RouterLink} to='/login'>
+                    <Tooltip label="Salir">
                         <Box display="flex" alignItems="center">
-                            <Icon as={RiLogoutCircleRLine} boxSize={5} color={useColorModeValue('brand.600')} />
+                            <Icon as={MdLogout} boxSize={5} color={useColorModeValue('brand.600')} />
                         </Box>
-                    </Link>
+                    </Tooltip>
+                </Link>
             </Flex>
         </>
     )

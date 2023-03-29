@@ -1,5 +1,4 @@
 ﻿using Sensorize.Api.Helpers.Email;
-using Sensorize.Api.Models.AppSettings;
 using Sensorize.Api.Models.Dto;
 using Sensorize.Domain.Enums;
 using Sensorize.Domain.Models;
@@ -7,15 +6,15 @@ using Sensorize.Repository.Repository;
 
 namespace Sensorize.Api.Services
 {
-    public class StateNotificationService : BackgroundService
+    public class DeviceStateNotificationService : BackgroundService
     {
-        private const int MAX_MINUTES_WAIT_TO_ALERT = 3;
-        private const int MINUTES_CYCLE_INTERVAL = 1;
+        private const int MAX_MINUTES_WAIT_TO_ALERT = 5;
+        private const int MINUTES_CYCLE_INTERVAL = 5;
         private readonly IServiceProvider _serviceProvider;
         private IDeviceRepository? _deviceRepository;
         private IEmailSender? _emailSender;
 
-        public StateNotificationService(IServiceProvider serviceProvider)
+        public DeviceStateNotificationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }

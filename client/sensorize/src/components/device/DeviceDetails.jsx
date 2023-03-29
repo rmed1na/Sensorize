@@ -44,7 +44,6 @@ export default function DeviceDetails({
 }) {
     const toast = useToast();
     const [groups, setGroups] = useState([]);
-    //const [groupsOptions, setGroupsOptions] = useState([]);
     let measureOptions = [
         {
             value: 1,
