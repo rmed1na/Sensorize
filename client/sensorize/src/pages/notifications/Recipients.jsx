@@ -238,7 +238,7 @@ export default function Recipients() {
                                                 <Td>{r.firstName} {r.lastName}</Td>
                                                 <Td>{r.email}</Td>
                                                 <Td>{r.isActive ? <Badge colorScheme="green">Activo</Badge> : <Badge colorScheme="red">Inactivo</Badge>}</Td>
-                                                <Td></Td>
+                                                <Td><Badge colorScheme="brand">{r.groupName}</Badge></Td>
                                                 <Td>{dateUtil.toReadableString(r.createdDate)}</Td>
                                                 <Td>{dateUtil.toReadableString(r.updatedDate)}</Td>
                                                 <Td>

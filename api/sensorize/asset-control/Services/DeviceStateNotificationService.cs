@@ -9,7 +9,7 @@ namespace Sensorize.Api.Services
     public class DeviceStateNotificationService : BackgroundService
     {
         private const int MAX_MINUTES_WAIT_TO_ALERT = 5;
-        private const int MINUTES_CYCLE_INTERVAL = 5;
+        private const int MINUTES_CYCLE_INTERVAL = 1;
         private readonly IServiceProvider _serviceProvider;
         private IDeviceRepository? _deviceRepository;
         private IEmailSender? _emailSender;

@@ -17,14 +17,12 @@ import {
     AccordionPanel,
     Heading,
     useToast,
-    Checkbox,
     Slider,
     SliderMark,
     SliderTrack,
     SliderFilledTrack,
     SliderThumb,
-    Switch,
-    Tooltip
+    Switch
 } from "@chakra-ui/react";
 // Chakra select
 import { Select as ChakraSelect, chakraComponents } from 'chakra-react-select';
@@ -232,12 +230,13 @@ export default function DeviceDetails({
                         label: g.name
                     }
                 });
+
                 component = (
                     <>
                         <FormControl py={2}>
-                            <FormLabel>Nivel de alerta: {device?.alertMinLevel ?? '10'}%</FormLabel>
+                            <FormLabel>Nivel de alerta: {device?.alertMinLevel ?? '0'}%</FormLabel>
                             <Slider
-                                defaultValue={device?.alertMinLevel ?? 10}
+                                defaultValue={device?.alertMinLevel ?? 0}
                                 min={0}
                                 max={100}
                                 step={1}
