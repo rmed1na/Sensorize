@@ -1,9 +1,8 @@
-const API_BASE_URL = 'https://localhost:7168/api';
-
+const api = import.meta.env.VITE_API_BASE_URL;
 const resources = {
     device: {
         getAll: async function () {
-            const response = await fetch(`${API_BASE_URL}/device`)
+            const response = await fetch(`${api}/device`)
 
             if (response.ok) {
                 const data = await response.json();
@@ -13,7 +12,7 @@ const resources = {
             }
         },
         update: async function (device, callBack = null) {
-            const response = await fetch(`${API_BASE_URL}/device/${device.deviceId}`, {
+            const response = await fetch(`${api}/device/${device.deviceId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -47,7 +46,7 @@ const resources = {
     notification: {
         group: {
             create: async function (group, successCallback = null, errorCallback = null) {
-                const response = await fetch(`${API_BASE_URL}/notification/group`, {
+                const response = await fetch(`${api}/notification/group`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -69,7 +68,7 @@ const resources = {
                 }
             },
             update: async function (group, successCallback = null, errorCallback = null) {
-                const response = await fetch(`${API_BASE_URL}/notification/group/${group.id}`, {
+                const response = await fetch(`${api}/notification/group/${group.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -91,7 +90,7 @@ const resources = {
                 }
             },
             getAll: async function () {
-                const response = await fetch(`${API_BASE_URL}/notification/group`);
+                const response = await fetch(`${api}/notification/group`);
 
                 if (response.ok) {
                     const data = await response.json();
@@ -101,7 +100,7 @@ const resources = {
                 }
             },
             delete: async function (group, successCallback = null, errorCallback = null) {
-                const response = await fetch(`${API_BASE_URL}/notification/group/${group.id}`, {
+                const response = await fetch(`${api}/notification/group/${group.id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -124,7 +123,7 @@ const resources = {
         },
         recipient: {
             create: async function (recipient, successCallback = null, errorCallback = null) {
-                const response = await fetch(`${API_BASE_URL}/notification/recipient`, {
+                const response = await fetch(`${api}/notification/recipient`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -151,7 +150,7 @@ const resources = {
                 }
             },
             getAll: async function () {
-                const response = await fetch(`${API_BASE_URL}/notification/recipient`);
+                const response = await fetch(`${api}/notification/recipient`);
 
                 if (response.ok) {
                     const data = await response.json();
@@ -161,7 +160,7 @@ const resources = {
                 }
             },
             update: async function (recipient, successCallback = null, errorCallback = null) {
-                const response = await fetch(`${API_BASE_URL}/notification/recipient/${recipient.id}`, {
+                const response = await fetch(`${api}/notification/recipient/${recipient.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -188,7 +187,7 @@ const resources = {
                 }
             },
             delete: async function (recipient, successCallback = null, errorCallback = null) {
-                const response = await fetch(`${API_BASE_URL}/notification/recipient/${recipient.id}`, {
+                const response = await fetch(`${api}/notification/recipient/${recipient.id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -215,7 +214,7 @@ const resources = {
 
 // DEVICES
 async function getDevices() {
-    const response = await fetch(`${API_BASE_URL}/device`)
+    const response = await fetch(`${api}/device`)
 
     if (response.ok) {
         const data = await response.json();
@@ -226,7 +225,7 @@ async function getDevices() {
 }
 
 async function createDevice(device, successCallback = null, errorCallback = null) {
-    const response = await fetch(`${API_BASE_URL}/device`, {
+    const response = await fetch(`${api}/device`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -262,7 +261,7 @@ async function createDevice(device, successCallback = null, errorCallback = null
 }
 
 function getStatusEventSource() {
-    return new EventSource(`${API_BASE_URL}/device/states`);
+    return new EventSource(`${api}/device/states`);
 }
 
 function throwError(response) {
