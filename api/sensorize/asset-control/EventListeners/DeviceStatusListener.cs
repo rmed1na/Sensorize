@@ -3,6 +3,7 @@ using MQTTnet;
 using MQTTnet.Client;
 using Sensorize.Api.Controllers.Handlers;
 using Sensorize.Api.Helpers.Email;
+using Sensorize.Api.Models.AppSettings;
 using Sensorize.Repository.Repository;
 using System.Text.Json;
 
@@ -14,6 +15,7 @@ namespace AssetControl.Api.EventListeners
         private readonly IMqttClient _mqttClient;
         private readonly IMemoryCache _cache;
         private readonly IDeviceRepository _deviceRepository;
+        private readonly ApiSettings _settings;
 
         public static string StreamKey => "sensorize_device_status";
 
@@ -24,6 +26,7 @@ namespace AssetControl.Api.EventListeners
             _mqttFactory = new MqttFactory();
             _mqttClient = _mqttFactory.CreateMqttClient();
             _cache = serviceProvider.GetRequiredService<IMemoryCache>();
+            _settings = serviceProvider.GetRequiredService<ApiSettings>();
             _deviceRepository = scope.ServiceProvider.GetRequiredService<IDeviceRepository>();
         }
 
@@ -36,8 +39,7 @@ namespace AssetControl.Api.EventListeners
                 return;
             }
 
-            // TODO: Replace localhost with db value
-            await _mqttClient.ConnectAsync(BuildMqttClient("localhost"), CancellationToken.None);
+            await _mqttClient.ConnectAsync(BuildMqttClient(_settings.MqttServer.Ip, _settings.MqttServer.Port), CancellationToken.None);
             _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
                 var device = await _deviceRepository.GetAsync(e.ApplicationMessage.Topic);
@@ -67,9 +69,9 @@ namespace AssetControl.Api.EventListeners
         }
 
         #region Helpers
-        private MqttClientOptions? BuildMqttClient(string server)
+        private static MqttClientOptions? BuildMqttClient(string? server, int? port = null)
             => new MqttClientOptionsBuilder()
-                .WithTcpServer(server)
+                .WithTcpServer(server, port)
                 .Build();
 
         private async Task SubscribeToTopicAsync(string topic)

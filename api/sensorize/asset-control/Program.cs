@@ -30,6 +30,7 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
+builder.Services.AddSingleton(appSettings);
 
 // Database
 builder.Services.AddDbContext<SensorizeContext>(options =>

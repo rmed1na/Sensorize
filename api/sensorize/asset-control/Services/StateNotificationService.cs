@@ -1,5 +1,7 @@
 ﻿using Sensorize.Api.Helpers.Email;
+using Sensorize.Api.Models.AppSettings;
 using Sensorize.Api.Models.Dto;
+using Sensorize.Domain.Enums;
 using Sensorize.Domain.Models;
 using Sensorize.Repository.Repository;
 
@@ -14,7 +16,9 @@ namespace Sensorize.Api.Services
         private IEmailSender? _emailSender;
 
         public StateNotificationService(IServiceProvider serviceProvider)
-            => _serviceProvider = serviceProvider;
+        {
+            _serviceProvider = serviceProvider;
+        }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -73,7 +77,8 @@ namespace Sensorize.Api.Services
                 if (!state.IsNotified)
                 {
                     var deviceName = state.Device?.Name;
-                    foreach (var recipient in state.Device?.NotificationGroup?.Recipients ?? Enumerable.Empty<NotificationRecipient>())
+                    var recipients = state.Device?.NotificationGroup?.Recipients?.Where(r => r.StatusCode == GlobalStatusCode.Active);
+                    foreach (var recipient in recipients ?? Enumerable.Empty<NotificationRecipient>())
                     {
                         await _emailSender
                             .SendAsync(new EmailRequest
