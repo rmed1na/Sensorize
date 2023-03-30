@@ -13,16 +13,11 @@ namespace AssetControl.Api.Controllers
     [ApiController]
     public class DeviceController : ControllerBase
     {
-        private const int MAX_MINUTES_WAIT_TO_ALERT = 5;
         private readonly IDeviceRepository _deviceRepository;
-        private readonly IEmailSender _emailSender;
 
-        public DeviceController(
-            IDeviceRepository deviceRepository,
-            IEmailSender emailSender)
+        public DeviceController(IDeviceRepository deviceRepository)
         {
             _deviceRepository = deviceRepository;
-            _emailSender = emailSender;
         }
 
         [HttpPost]
