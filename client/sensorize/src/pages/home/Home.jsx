@@ -1,10 +1,8 @@
-// React
-import { useState, useEffect, useRef } from 'react';
-
 // Chakra
 import { 
     Box, 
-    Flex } from '@chakra-ui/react';
+    Flex 
+} from '@chakra-ui/react';
 
 // CC
 import SideBar from '../../components/sidebar/SideBar';
