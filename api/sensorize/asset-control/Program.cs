@@ -60,8 +60,8 @@ builder.Services.AddHostedService<DeviceStateNotificationService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseCors(x =>
@@ -76,7 +76,7 @@ if (app.Environment.IsDevelopment())
         x.SetIsOriginAllowed(o => true);
         x.AllowCredentials();
     });
-}
+//}
 
 await new DeviceStatusListener(app.Services).ListenAsync();
 app.UseHttpsRedirection();
