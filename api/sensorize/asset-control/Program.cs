@@ -79,7 +79,7 @@ var app = builder.Build();
 //}
 
 await new DeviceStatusListener(app.Services).ListenAsync();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
