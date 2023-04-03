@@ -66,7 +66,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseCors(x =>
     {
-        x.AllowAnyMethod();
+        if (appSettings.AllowedOrigins != null)
+        {
+            x.AllowAnyMethod().WithOrigins(appSettings.AllowedOrigins.Split(','));
+        } else
+            x.AllowAnyMethod();
+
         x.AllowAnyHeader();
         x.SetIsOriginAllowed(o => true);
         x.AllowCredentials();
