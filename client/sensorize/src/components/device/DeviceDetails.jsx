@@ -96,7 +96,7 @@ export default function DeviceDetails({
     }
     const handleMeasurePropChange = (code, value) => {
         let exists = false;
-        let updatedProps = device.measureProperties.map(p => {
+        let updatedProps = device?.measureProperties?.map(p => {
             if (p.code == code) {
                 exists = true;
                 return { ...p, value: value };
