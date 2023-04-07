@@ -15,6 +15,12 @@ import SideBar from "../../components/sidebar/SideBar";
 import api from "../../api/api";
 
 export default function Devices() {
+    const emptyDevice = {
+        name: '',
+        topic: '',
+        channel: '',
+        measureProperties: []
+    }
     const [devices, setDevices] = useState([]);
     const [selectedDevice, setSelectedDevice] = useState();
 
@@ -44,14 +50,14 @@ export default function Devices() {
                             <Divider mb={3} />
 
                             <Box maxH={750} sx={{ overflowY: 'auto', cursor: 'pointer' }}>
-                                <DeviceListItem isNewPlaceholder={true} onClick={onDeviceItemClick} />
+                                <DeviceListItem isNewPlaceholder={true} device={emptyDevice} onClick={() => onDeviceItemClick(emptyDevice)} />
                                 {devices && devices.map(d => {
-                                    return <DeviceListItem key={d.deviceId} device={d} onClick={onDeviceItemClick} />
+                                    return <DeviceListItem key={d.deviceId} device={d} onClick={() => onDeviceItemClick(d)} />
                                 })}
                             </Box>
                         </Box>
                         <Box w="60%">
-                            <Heading as="h3" color="brand.500" p={1}>Detalles { selectedDevice ? `del dispositivo ${selectedDevice.name}` : '' }</Heading>
+                            <Heading as="h3" color="brand.500" p={1}>Detalles del dispositivo { selectedDevice ? `${selectedDevice.name}` : '' }</Heading>
                             <Divider />
 
                             <Box m={5}>

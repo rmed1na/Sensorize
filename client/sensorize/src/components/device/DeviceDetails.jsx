@@ -306,7 +306,7 @@ export default function DeviceDetails({
                                 placeholder="Nombre del dispositivo (tanque, planta, etc.)"
                                 type="text"
                                 onChange={e => handleNameChange(e)}
-                                value={device ? device?.name : ''} />
+                                value={device?.name ?? ''} />
                         </FormControl>
                     </AccordionPanel>
                 </AccordionItem>

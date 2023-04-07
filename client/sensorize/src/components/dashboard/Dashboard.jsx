@@ -40,7 +40,7 @@ export default function Dashboard() {
                 ...JSON.parse(e.data),
                 lastUpdate: new Date().toLocaleDateString()
             };
-            console.log('data', data);
+            
             let updatedDeviceStates = deviceStatesRef.current
                 .filter(x => x.device.deviceId !== data.device.deviceId)
                 .concat(data);
