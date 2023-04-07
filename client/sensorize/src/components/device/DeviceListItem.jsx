@@ -3,6 +3,7 @@ import { Card, CardBody, CardHeader, Heading, Text } from "@chakra-ui/react";
 export default function DeviceListItem({
     device,
     onClick,
+    isSelected = false,
     isNewPlaceholder = false
 }) {
     if (isNewPlaceholder) {
@@ -30,7 +31,9 @@ export default function DeviceListItem({
             mx={3} 
             my={2} 
             bg="blackAlpha.100"
-            onClick={() => onClick(device)}>
+            onClick={() => onClick(device)}
+            border={isSelected ? '2px solid' : 'initial'}
+            borderColor={isSelected ? 'brand.400' : 'none'}>
             <CardHeader pt={3.5} pb={0.5}>
                 <Heading as="h4" color="brand.600">{device.name}</Heading>
             </CardHeader>

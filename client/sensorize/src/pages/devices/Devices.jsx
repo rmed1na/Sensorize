@@ -35,6 +35,10 @@ export default function Devices() {
 
     const onDeviceDataChange = () => getDevices();
     const onDeviceItemClick = (device) => {
+        setDevices(devices.map((d) => {
+            let isSelected = d.deviceId == device.deviceId;
+            return {...d, isSelected: isSelected};
+        }));
         setSelectedDevice(device);
     };
 
@@ -52,7 +56,7 @@ export default function Devices() {
                             <Box maxH={750} sx={{ overflowY: 'auto', cursor: 'pointer' }}>
                                 <DeviceListItem isNewPlaceholder={true} device={emptyDevice} onClick={() => onDeviceItemClick(emptyDevice)} />
                                 {devices && devices.map(d => {
-                                    return <DeviceListItem key={d.deviceId} device={d} onClick={() => onDeviceItemClick(d)} />
+                                    return <DeviceListItem isSelected={d.isSelected} key={d.deviceId} device={d} onClick={() => onDeviceItemClick(d)} />
                                 })}
                             </Box>
                         </Box>
