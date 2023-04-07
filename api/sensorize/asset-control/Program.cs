@@ -1,6 +1,7 @@
 using AssetControl.Api.EventListeners;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using MQTTnet;
 using Sensorize.Api;
 using Sensorize.Api.Models.AppSettings;
 using Sensorize.Api.Services;
@@ -13,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 var appSettings = builder.Configuration
     .GetSection("Application")
     .Get<ApiSettings>();
+
+var mqttFactory = new MqttFactory();
 
 #region Services
 // Add services to the container.
@@ -31,14 +34,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton(appSettings);
-
-// Database
+builder.Services.AddSingleton(mqttFactory);
+builder.Services.AddSingleton(mqttFactory.CreateMqttClient());
 builder.Services.AddDbContext<SensorizeContext>(options =>
 {
     options.UseMySQL(appSettings.DataSource.BuildMySqlConnectionString());
 }, ServiceLifetime.Transient);
-
-// Email
 builder.Services
     .AddFluentEmail(appSettings.SystemEmail.Address, appSettings.SystemEmail.DisplayName)
     .AddSmtpSender(new SmtpClient
@@ -50,10 +51,8 @@ builder.Services
         Credentials = new NetworkCredential(appSettings.SystemEmail.Address, appSettings.SystemEmail.Password)
     });
 
-// DI
 DependencyInjection.Configure(builder.Services);
 
-// Custom services
 builder.Services.AddHostedService<DeviceStateNotificationService>();
 #endregion
 
@@ -79,7 +78,7 @@ var app = builder.Build();
 //}
 
 await new DeviceStatusListener(app.Services).ListenAsync();
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

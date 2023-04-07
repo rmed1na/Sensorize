@@ -2,7 +2,6 @@
 using MQTTnet;
 using MQTTnet.Client;
 using Sensorize.Api.Controllers.Handlers;
-using Sensorize.Api.Helpers.Email;
 using Sensorize.Api.Models.AppSettings;
 using Sensorize.Repository.Repository;
 using System.Text.Json;
@@ -23,8 +22,8 @@ namespace AssetControl.Api.EventListeners
         {
             var scope = serviceProvider.CreateScope();
 
-            _mqttFactory = new MqttFactory();
-            _mqttClient = _mqttFactory.CreateMqttClient();
+            _mqttFactory = serviceProvider.GetRequiredService<MqttFactory>();
+            _mqttClient = serviceProvider.GetRequiredService<IMqttClient>();
             _cache = serviceProvider.GetRequiredService<IMemoryCache>();
             _settings = serviceProvider.GetRequiredService<ApiSettings>();
             _deviceRepository = scope.ServiceProvider.GetRequiredService<IDeviceRepository>();
@@ -63,9 +62,18 @@ namespace AssetControl.Api.EventListeners
                 }
             };
 
-            // TODO: Handle new subscriptions that may come in after startup (new added device)
             foreach (var topic in devices.Where(d => d.Topic != null).Select(d => d.Topic))
-                await SubscribeToTopicAsync(topic!);
+                await SubscribeToTopicAsync(_mqttFactory, _mqttClient, topic!);
+        }
+
+        public static async Task SubscribeToTopicAsync(MqttFactory factory, IMqttClient client, string topic)
+        {
+            var options = factory
+                .CreateSubscribeOptionsBuilder()
+                .WithTopicFilter(f => f.WithTopic(topic))
+                .Build();
+
+            await client.SubscribeAsync(options, CancellationToken.None);
         }
 
         #region Helpers
@@ -73,17 +81,6 @@ namespace AssetControl.Api.EventListeners
             => new MqttClientOptionsBuilder()
                 .WithTcpServer(server, port)
                 .Build();
-
-        private async Task SubscribeToTopicAsync(string topic)
-        {
-            var mqttSubscriberOptions = _mqttFactory.CreateSubscribeOptionsBuilder()
-                .WithTopicFilter(f =>
-                {
-                    f.WithTopic(topic);
-                }).Build();
-
-            await _mqttClient.SubscribeAsync(mqttSubscriberOptions, CancellationToken.None);
-        }
         #endregion
     }
 }

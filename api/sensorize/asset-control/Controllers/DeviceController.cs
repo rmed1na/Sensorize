@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Sensorize.Api.Helpers.Email;
+﻿using AssetControl.Api.EventListeners;
+using Microsoft.AspNetCore.Mvc;
+using MQTTnet;
+using MQTTnet.Client;
 using Sensorize.Api.Models.Dto;
 using Sensorize.Domain.Enums;
 using Sensorize.Domain.Models;
 using Sensorize.Repository.Repository;
-using Sensorize.Utility.Extensions;
 using System.Text.Json;
 
 namespace AssetControl.Api.Controllers
@@ -14,10 +15,14 @@ namespace AssetControl.Api.Controllers
     public class DeviceController : ControllerBase
     {
         private readonly IDeviceRepository _deviceRepository;
+        private readonly MqttFactory _mqttFactory;
+        private readonly IMqttClient _mqttClient;
 
-        public DeviceController(IDeviceRepository deviceRepository)
+        public DeviceController(IDeviceRepository deviceRepository, IServiceProvider serviceProvider)
         {
             _deviceRepository = deviceRepository;
+            _mqttFactory = serviceProvider.GetRequiredService<MqttFactory>();
+            _mqttClient = serviceProvider.GetRequiredService<IMqttClient>();
         }
 
         [HttpPost]
@@ -59,6 +64,7 @@ namespace AssetControl.Api.Controllers
             }
 
             await _deviceRepository.AddAsync(device);
+            await DeviceStatusListener.SubscribeToTopicAsync(_mqttFactory, _mqttClient, device.Topic);
             return Ok(new DeviceDto(device));
         }
 
