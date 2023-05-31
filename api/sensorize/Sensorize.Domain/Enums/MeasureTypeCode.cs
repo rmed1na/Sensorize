@@ -10,6 +10,9 @@ namespace Sensorize.Domain.Enums
         Volume,
 
         [Display(Name = "Temperatura")]
-        Temperature
+        Temperature,
+
+        [Display(Name = "Binario")]
+        Binary
     }
 }

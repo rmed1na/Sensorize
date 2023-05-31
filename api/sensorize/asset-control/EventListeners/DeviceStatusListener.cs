@@ -3,6 +3,7 @@ using MQTTnet;
 using MQTTnet.Client;
 using Sensorize.Api.Controllers.Handlers;
 using Sensorize.Api.Models.AppSettings;
+using Sensorize.Domain.Models;
 using Sensorize.Repository.Repository;
 using System.Text.Json;
 
@@ -31,16 +32,10 @@ namespace AssetControl.Api.EventListeners
 
         public async Task ListenAsync()
         {
-            var devices = await _deviceRepository.GetAllAsync();
-            if (devices == null || !devices.Any())
-            {
-                Console.WriteLine("No devices to subscribe to");
-                return;
-            }
-
             await _mqttClient.ConnectAsync(BuildMqttClient(_settings.MqttServer.Ip, _settings.MqttServer.Port), CancellationToken.None);
             _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
+                Console.WriteLine($"New message received on topic: {e.ApplicationMessage.Topic} at {DateTime.Now}");
                 var device = await _deviceRepository.GetAsync(e.ApplicationMessage.Topic);
 
                 if (device != null)
@@ -54,13 +49,29 @@ namespace AssetControl.Api.EventListeners
                         return;
 
                     var measurementStr = measurementObj.ToString();
-                    if (!string.IsNullOrEmpty(measurementStr) && double.TryParse(measurementStr, out double measurement))
+                    var isDouble = double.TryParse(measurementStr, out double measurementDouble);
+                    var isBool = bool.TryParse(measurementStr, out bool measurementBool);
+                    if (!string.IsNullOrEmpty(measurementStr))
                     {
-                        var state = DeviceStateHandler.ComputeMeasurement(device, measurement);
+                        DeviceState? state = null;
+
+                        if (isBool)
+                            state = DeviceStateHandler.ComputeMeasurement(device, measurementBool);
+                        if (isDouble)
+                            state = DeviceStateHandler.ComputeMeasurement(device, measurementDouble);
+
+                        ArgumentNullException.ThrowIfNull(state);
                         await _deviceRepository.UpsertState(state);
                     }
                 }
             };
+
+            var devices = await _deviceRepository.GetAllAsync();
+            if (devices == null || !devices.Any())
+            {
+                Console.WriteLine("No devices to subscribe to");
+                return;
+            }
 
             foreach (var topic in devices.Where(d => d.Topic != null).Select(d => d.Topic))
                 await SubscribeToTopicAsync(_mqttFactory, _mqttClient, topic!);

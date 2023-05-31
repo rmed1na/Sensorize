@@ -53,7 +53,7 @@ builder.Services
 
 DependencyInjection.Configure(builder.Services);
 
-builder.Services.AddHostedService<DeviceStateNotificationService>();
+builder.Services.AddHostedService<DeviceStateNotificationService>(); 
 #endregion
 
 var app = builder.Build();

@@ -1,4 +1,5 @@
-﻿using Sensorize.Domain.Enums;
+﻿using Microsoft.OpenApi.Extensions;
+using Sensorize.Domain.Enums;
 using Sensorize.Domain.Models;
 using Sensorize.Domain.Models.Constants;
 
@@ -33,6 +34,26 @@ namespace Sensorize.Api.Controllers.Handlers
             }
 
             return state;
+        }
+
+        public static DeviceState ComputeMeasurement(Device device, bool value)
+        {
+            switch (device.MeasureTypeCode)
+            {
+                case MeasureTypeCode.Binary:
+                    var state = new DeviceState
+                    {
+                        DeviceId = device.DeviceId,
+                        Measurement = value ? 1 : 0,
+                        Description = value 
+                            ? device.MeasureProperties?.First(p => p.PropertyCode == MeasurePropertyCode.BinaryTrueLabel).PropertyValue
+                            : device.MeasureProperties?.First(p => p.PropertyCode == MeasurePropertyCode.BinaryFalseLabel).PropertyValue
+                    };
+
+                    return state;
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

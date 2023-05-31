@@ -29,7 +29,8 @@ import { Select as ChakraSelect, chakraComponents } from 'chakra-react-select';
 // Icons
 import {
     MdScience,
-    MdDeviceThermostat
+    MdDeviceThermostat,
+    MdPowerSettingsNew
 } from 'react-icons/md';
 // CC
 import api from '../../api/api';
@@ -52,6 +53,11 @@ export default function DeviceDetails({
             value: 2,
             label: "Temperatura",
             icon: <Icon as={MdDeviceThermostat} mr={2} color="brand.600" />
+        },
+        {
+            value: 3,
+            label: "Binario",
+            icon: <Icon as={MdPowerSettingsNew} mr={2} color="brand.600" />
         }
     ];
 
@@ -82,6 +88,7 @@ export default function DeviceDetails({
 
         setDevice({ ...device, hasAlert: e.target.checked })
     };
+
     const handleAlertLevel = (e, bound) => {
         switch (bound) {
             case 'min':
@@ -94,6 +101,7 @@ export default function DeviceDetails({
                 break;
         }
     }
+
     const handleMeasurePropChange = (code, value) => {
         let exists = false;
         let updatedProps = device?.measureProperties?.map(p => {
@@ -110,6 +118,7 @@ export default function DeviceDetails({
 
         setDevice({ ...device, measureProperties: updatedProps });
     }
+    
     const handleAlertGroupChange = (e) => setDevice({ ...device, notificationGroupId: e.value });
 
     async function upsert() {
@@ -213,6 +222,19 @@ export default function DeviceDetails({
                 break;
             case 2: // Temperature
                 break;
+            case 3: // Binary
+                component = (
+                    <Flex>
+                        <FormControl py={2} pr={2} isRequired>
+                            <FormLabel>Etiqueta de valor cierto</FormLabel>
+                            <Input type="text" value={safePropertyValue('BIN.TRUEVALUE')} onChange={e => handleMeasurePropChange('BIN.TRUEVALUE', e.target.value)} />
+                        </FormControl>
+                        <FormControl py={2} pr={2} isRequired>
+                            <FormLabel>Etiqueta de valor falso</FormLabel>
+                            <Input type="text" value={safePropertyValue('BIN.FALSEVALUE')} onChange={e => handleMeasurePropChange('BIN.FALSEVALUE', e.target.value)} />
+                        </FormControl>
+                    </Flex>
+                );
             default: // Empty
                 break;
         }
