@@ -18,6 +18,7 @@ namespace Sensorize.Api.Models.Dto
 		public bool HasAlert { get; set; }
 		public double? AlertMinLevel { get; set; }
 		public double? AlertMaxLevel { get; set; }
+		public string? AlertOn { get; set; }
 		public int? NotificationGroupId { get; set; }
 		public ICollection<MeasurePropertyDto> MeasureProperties { get; set; } = new List<MeasurePropertyDto>();
 
@@ -48,6 +49,7 @@ namespace Sensorize.Api.Models.Dto
 				HasAlert = device.HasAlert;
 				AlertMinLevel = device.AlertMinRatio * 100;
 				AlertMaxLevel = device.AlertMaxRatio * 100;
+				AlertOn = device.AlertOn;
 			}
 		}
 	}

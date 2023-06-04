@@ -26,6 +26,7 @@ const resources = {
                     hasAlert: device.hasAlert,
                     alertMinLevel: device.alertMinLevel,
                     alertMaxLevel: device.alertMaxLevel,
+                    alertOn: device.alertOn,
                     notificationGroupId: device.notificationGroupId
                 })
             });
@@ -238,7 +239,9 @@ async function createDevice(device, successCallback = null, errorCallback = null
             channel: device.channel,
             hasAlert: device.hasAlert,
             alertMinLevel: device.alertMinLevel,
-            alertMaxLevel: device.alertMaxLevel
+            alertMaxLevel: device.alertMaxLevel,
+            alertOn: device.alertOn,
+            notificationGroupId: device.notificationGroupId
         })
     });
 

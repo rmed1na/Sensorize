@@ -17,13 +17,15 @@ namespace Sensorize.Api.Models.Dto
 
 		public DeviceStateDto(DeviceState state)
 		{
-			Device = new DeviceDto(state.Device!);
+            ArgumentNullException.ThrowIfNull(state.Device);
+
+            Device = new DeviceDto(state.Device);
 			Measurement = state.Measurement;
 			Description = state.Description;
 			LastUpdate = state.UpdatedDate ?? state.CreatedDate;
 			TimeSpanDescription = (DateTime.Now - LastUpdate).Humanize(culture: new CultureInfo("es"));
-			
-			if (state.Device!.HasAlert)
+
+			if (state.Device.HasAlert)
 			{
 				switch (state.Device.MeasureTypeCode)
 				{
@@ -33,6 +35,14 @@ namespace Sensorize.Api.Models.Dto
 							var currentRatio = state.Measurement / maxCap;
 							if (currentRatio <= state.Device.AlertMinRatio)
 								IsOnAlert = true;
+						}
+						break;
+					case MeasureTypeCode.Binary:
+						var value = state.Measurement == 1d;
+						
+						if (bool.TryParse(state.Device.AlertOn, out bool trigger) && value == trigger)
+						{
+							IsOnAlert = true;
 						}
 						break;
 					default:

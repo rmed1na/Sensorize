@@ -54,6 +54,7 @@ namespace AssetControl.Api.Controllers
             {
                 device.AlertMinRatio = request.AlertMinLevel / 100;
                 device.AlertMaxRatio = request.AlertMaxLevel / 100;
+                device.AlertOn = request.AlertOn;
             }
 
             if (request.MeasureProperties != null && request.MeasureProperties.Any())
@@ -110,12 +111,14 @@ namespace AssetControl.Api.Controllers
                 device.HasAlert = true;
                 device.AlertMinRatio = request.AlertMinLevel / 100;
                 device.AlertMaxRatio = request.AlertMaxLevel / 100;
+                device.AlertOn = request.AlertOn;
             }
             else
             {
                 device.HasAlert = false;
                 device.AlertMinRatio = null;
                 device.AlertMaxRatio = null;
+                device.AlertOn = null;
             }
 
             await _deviceRepository.SaveAsync(device);

@@ -8,7 +8,7 @@ import {
 // React
 import { useEffect, useState } from "react";
 // CC
-import DeviceDetails from "../../components/device/DeviceDetails";
+import DeviceDetails from "../../components/device/details/DeviceDetails";
 import DeviceListItem from "../../components/device/DeviceListItem";
 import Navbar from "../../components/Navbar";
 import SideBar from "../../components/sidebar/SideBar";
