@@ -1,6 +1,6 @@
 ﻿namespace Sensorize.Api.Helpers.Email
 {
-    public interface IEmailSender
+    public interface IEmailClient
     {
         public Task<bool> SendAsync(EmailRequest request);
     }

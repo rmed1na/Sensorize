@@ -20,6 +20,7 @@ namespace Sensorize.Api.Models.Dto
 		public double? AlertMaxLevel { get; set; }
 		public string? AlertOn { get; set; }
 		public int? NotificationGroupId { get; set; }
+		public int? StateNotificationFrequency { get; set; }
 		public ICollection<MeasurePropertyDto> MeasureProperties { get; set; } = new List<MeasurePropertyDto>();
 
 		public DeviceDto() { }
@@ -36,6 +37,7 @@ namespace Sensorize.Api.Models.Dto
 			Topic = device.Topic;
 			Channel = device.Channel;
 			NotificationGroupId = device.NotificationGroupId;
+			StateNotificationFrequency = device.StateNotificationFrequency;
 
 			if (device.MeasureProperties != null && device.MeasureProperties.Any())
 			{

@@ -1,5 +1,5 @@
 // React
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 // Chakra
 import {
     Accordion,
@@ -16,6 +16,7 @@ import GeneralSection from "./sections/General";
 import MessageBrokerSection from "./sections/MessageBroker";
 import MeasureTypeSection from './sections/MeasureType';
 import AlertSection from './sections/Alert';
+import NotificationsSection from './sections/Notifications';
 
 export default function DeviceDetails({
     device,
@@ -23,11 +24,17 @@ export default function DeviceDetails({
     onDataSave
 }) {
     const toast = useToast();
+    const [notificationGroups, setNotificationGroups] = useState([]);
+
+    async function loadGroups() {
+        const groups = await api.resources.notification.group.getAll();
+        setNotificationGroups(groups);
+    }
 
     async function upsert() {
         // New device
         if (!device || !device.deviceId || device.deviceId == 0) {
-            let response = await api.createDevice(
+            let response = await api.resources.device.create(
                 device,
                 function () {
                     toast({
@@ -82,6 +89,8 @@ export default function DeviceDetails({
                 measureProperties: []
             });
         }
+
+        loadGroups();
     }, []);
 
     return (
@@ -104,6 +113,7 @@ export default function DeviceDetails({
                 <GeneralSection device={device} setDevice={setDevice} />
                 <MessageBrokerSection device={device} setDevice={setDevice} />
                 <MeasureTypeSection device={device} setDevice={setDevice} />
+                <NotificationsSection device={device} setDevice={setDevice} notificationGroups={notificationGroups} />
                 <AlertSection device={device} setDevice={setDevice} />
             </Accordion>
             <Flex gap={2} justify="flex-end" my={5}>

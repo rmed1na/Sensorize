@@ -10,13 +10,15 @@ namespace Sensorize.Api.Services
     {
         private const int MAX_MINUTES_WAIT_TO_ALERT = 5;
         private const int MINUTES_CYCLE_INTERVAL = 1;
+        private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
         private IDeviceRepository? _deviceRepository;
-        private IEmailSender? _emailSender;
+        private IEmailClient? _emailClient;
 
-        public DeviceStateNotificationService(IServiceProvider serviceProvider)
+        public DeviceStateNotificationService(IServiceProvider serviceProvider, ILogger<DeviceStateNotificationService> logger)
         {
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,29 +34,36 @@ namespace Sensorize.Api.Services
 
                     using var scope = _serviceProvider.CreateScope();
                     _deviceRepository = scope.ServiceProvider.GetRequiredService<IDeviceRepository>();
-                    _emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+                    _emailClient = scope.ServiceProvider.GetRequiredService<IEmailClient>();
 
                     var states = await _deviceRepository
                         .GetStatesAsync()
                         .ConfigureAwait(false);
 
                     foreach (var state in states)
-                        await HandleStateNotificationAsync(state);
+                        await HandleNotificationsAsync(state);
                 }
             }
             catch (Exception ex)
             {
-                _ = ex;
+                _logger.LogError(ex, $"Error on {nameof(DeviceStateNotificationService)}.{nameof(this.ExecuteAsync)}");
                 throw;
             }
         }
 
-        private async Task HandleStateNotificationAsync(DeviceState state)
+        private async Task HandleNotificationsAsync(DeviceState state)
+        {
+            var dto = new DeviceStateDto(state);
+
+            await HandleAlertNotificationAsync(dto, state);
+            await HandleStateNotificationAsync(state);
+        }
+
+        private async Task HandleAlertNotificationAsync(DeviceStateDto dto, DeviceState state)
         {
             ArgumentNullException.ThrowIfNull(_deviceRepository);
-            ArgumentNullException.ThrowIfNull(_emailSender);
+            ArgumentNullException.ThrowIfNull(_emailClient);
 
-            var dto = new DeviceStateDto(state);
             if (dto.IsOnAlert && !state.AlertStateBegin.HasValue)
             {
                 state.AlertStateBegin = DateTime.Now;
@@ -79,7 +88,7 @@ namespace Sensorize.Api.Services
                     var recipients = state.Device?.NotificationGroup?.Recipients?.Where(r => r.StatusCode == GlobalStatusCode.Active);
                     foreach (var recipient in recipients ?? Enumerable.Empty<NotificationRecipient>())
                     {
-                        await _emailSender
+                        await _emailClient
                             .SendAsync(new EmailRequest
                             {
                                 To = recipient?.Email,
@@ -91,13 +100,48 @@ namespace Sensorize.Api.Services
                                     $"Medida: {state.Description}\n" +
                                     $"Desde: {state.AlertStateBegin}\n" +
                                     $"Última actualización hace: {dto.TimeSpanDescription}\n"
-                            });
+                            }).ConfigureAwait(false);
                     }
 
                     state.AlertStateEnd = DateTime.Now;
                     state.IsNotified = true;
                     await _deviceRepository.SaveAsync(state, false);
                 }
+            }
+        }
+
+        private async Task HandleStateNotificationAsync(DeviceState state)
+        {
+            ArgumentNullException.ThrowIfNull(state.Device);
+            ArgumentNullException.ThrowIfNull(_emailClient);
+            ArgumentNullException.ThrowIfNull(_deviceRepository);
+
+            if (!state.Device.StateNotificationFrequency.HasValue)
+                return;
+
+            var lastTime = state.LastStateNotification ?? DateTime.Now.AddMinutes(state.Device.StateNotificationFrequency.Value * -1);
+            var nextTime = lastTime.AddMinutes(state.Device.StateNotificationFrequency.Value);
+
+            if (nextTime < DateTime.Now)
+            {
+                var recipients = state.Device.NotificationGroup?.Recipients?.Where(r => r.StatusCode == GlobalStatusCode.Active);
+
+                foreach (var recipient in recipients ?? Enumerable.Empty<NotificationRecipient>())
+                {
+                    await _emailClient.SendAsync(new EmailRequest
+                    {
+                        To = recipient?.Email,
+                        Subject = $"Estado del dispositivo {state.Device.Name}",
+                        BodyText = $"Notificación del estado del dispositivo {state.Device.Name}.\n\n" +
+                                   $"Detalles:\n" + 
+                                   $"Dispositivo: {state.Device.Name}\n" + 
+                                   $"Estado: {state.Description}\n" + 
+                                   $"Última actualización: {state.UpdatedDate}"
+                    }).ConfigureAwait(false);
+                }
+
+                state.LastStateNotification = DateTime.Now;
+                await _deviceRepository.SaveAsync(state);
             }
         }
     }

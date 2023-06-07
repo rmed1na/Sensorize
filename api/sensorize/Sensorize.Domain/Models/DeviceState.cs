@@ -11,7 +11,9 @@ namespace Sensorize.Domain.Models
 		public bool IsNotified { get; set; }
 		public DateTime? AlertStateBegin { get; set; }
 		public DateTime? AlertStateEnd { get; set; }
+		public DateTime? LastStateNotification { get; set; }
 
-		public virtual Device? Device { get; set; }
+
+        public virtual Device? Device { get; set; }
 	}
 }

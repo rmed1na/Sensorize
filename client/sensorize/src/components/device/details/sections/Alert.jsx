@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { 
     AccordionItem,
     AccordionButton,
@@ -18,25 +17,11 @@ import {
     SliderFilledTrack,
     SliderThumb
 } from "@chakra-ui/react"
-import { Select as ChakraSelect, chakraComponents } from 'chakra-react-select';
-import api from '../../../../api/api';
 
 export default function Alert({
     device,
     setDevice
 }) {
-    const [groups, setGroups] = useState([]);
-
-    useEffect(() => {
-        loadGroups();
-    }, []);
-
-    async function loadGroups() {
-        const groups = await api.resources.notification.group.getAll();
-        setGroups(groups);
-    }
-
-    const handleAlertGroupChange = (e) => setDevice({ ...device, notificationGroupId: e.value });
     const handleHasAlertChange = (e) => {
         if (!device?.measureTypeCode) {
             toast({
@@ -71,12 +56,6 @@ export default function Alert({
 
     const alertTypeDetails = () => {
         let component;
-        let groupsOptions = groups.map(g => {
-            return {
-                value: g.id,
-                label: g.name
-            }
-        });
         
         switch (device?.measureTypeCode) {
             case 1: // Volume
@@ -101,16 +80,6 @@ export default function Alert({
                                 <SliderThumb />
                             </Slider>
                         </FormControl>
-                        <FormControl py={2}>
-                            <FormLabel>Grupo</FormLabel>
-                            <ChakraSelect
-                                menuPosition="fixed"
-                                placeholder="Seleccione un grupo"
-                                colorScheme="brand"
-                                options={groupsOptions}
-                                onChange={e => handleAlertGroupChange(e)}
-                                value={groupsOptions.find(g => g.value == device.notificationGroupId)} />
-                        </FormControl>
                     </>);
                 break;
             case 2: // Temperature
@@ -123,16 +92,6 @@ export default function Alert({
                             <Radio size='sm' value="false">Cuando el valor es falso</Radio>
                         </Stack>
                     </RadioGroup>
-                    <FormControl py={2}>
-                        <FormLabel>Grupo</FormLabel>
-                        <ChakraSelect
-                            menuPosition='fixed'
-                            placeholder='Seleccione un grupo'
-                            colorScheme='brand'
-                            options={groupsOptions}
-                            onChange={e => handleAlertGroupChange(e)}
-                            value={groupsOptions.find(g => g.value == device.notificationGroupId)} />
-                    </FormControl>
                 </>);
                 break;
             default:

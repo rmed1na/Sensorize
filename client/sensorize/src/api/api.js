@@ -11,6 +11,44 @@ const resources = {
                 throwError(response);
             }
         },
+        create: async function (device, successCallback = null, errorCallback = null) {
+            const response = await fetch(`${api}/device`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: device.name,
+                    topic: device.topic,
+                    measureTypeCode: device.measureTypeCode,
+                    measureProperties: device.measureProperties,
+                    channel: device.channel,
+                    hasAlert: device.hasAlert,
+                    alertMinLevel: device.alertMinLevel,
+                    alertMaxLevel: device.alertMaxLevel,
+                    alertOn: device.alertOn,
+                    notificationGroupId: device.notificationGroupId,
+                    stateNotificationFrequency: device.stateNotificationFrequency
+                })
+            });
+        
+            if (response.ok) {
+                const data = await response.json();
+        
+                if (successCallback != null) {
+                    successCallback();
+                }
+        
+                return data;
+            } else {
+                let message = await response.text();
+                if (errorCallback != null) {
+                    errorCallback(message);
+                }
+        
+                throwError(response);
+            }
+        },
         update: async function (device, callBack = null) {
             const response = await fetch(`${api}/device/${device.deviceId}`, {
                 method: 'PUT',
@@ -27,7 +65,8 @@ const resources = {
                     alertMinLevel: device.alertMinLevel,
                     alertMaxLevel: device.alertMaxLevel,
                     alertOn: device.alertOn,
-                    notificationGroupId: device.notificationGroupId
+                    notificationGroupId: device.notificationGroupId,
+                    stateNotificationFrequency: device.stateNotificationFrequency
                 })
             });
 
@@ -225,44 +264,6 @@ async function getDevices() {
     }
 }
 
-async function createDevice(device, successCallback = null, errorCallback = null) {
-    const response = await fetch(`${api}/device`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: device.name,
-            topic: device.topic,
-            measureTypeCode: device.measureTypeCode,
-            measureProperties: device.measureProperties,
-            channel: device.channel,
-            hasAlert: device.hasAlert,
-            alertMinLevel: device.alertMinLevel,
-            alertMaxLevel: device.alertMaxLevel,
-            alertOn: device.alertOn,
-            notificationGroupId: device.notificationGroupId
-        })
-    });
-
-    if (response.ok) {
-        const data = await response.json();
-
-        if (successCallback != null) {
-            successCallback();
-        }
-
-        return data;
-    } else {
-        let message = await response.text();
-        if (errorCallback != null) {
-            errorCallback(message);
-        }
-
-        throwError(response);
-    }
-}
-
 function getStatusEventSource() {
     return new EventSource(`${api}/device/states`);
 }
@@ -274,6 +275,5 @@ function throwError(response) {
 export default {
     getDevices,
     getStatusEventSource,
-    createDevice,
     resources
 }

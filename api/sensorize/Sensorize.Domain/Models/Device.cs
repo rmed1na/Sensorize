@@ -16,6 +16,7 @@ namespace Sensorize.Domain.Models
         public double? AlertMaxRatio { get; set; }
         public string? AlertOn { get; set; }
         public int? NotificationGroupId { get; set; }
+        public int? StateNotificationFrequency { get; set; }
 
         public virtual ICollection<DeviceMeasureProperty>? MeasureProperties { get; set; }
         public virtual NotificationGroup? NotificationGroup { get; set; }

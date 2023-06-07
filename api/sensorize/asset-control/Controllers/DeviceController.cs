@@ -48,6 +48,7 @@ namespace AssetControl.Api.Controllers
                 Channel = request.Channel,
                 HasAlert = request.HasAlert,
                 NotificationGroupId = request.NotificationGroupId,
+                StateNotificationFrequency = request.StateNotificationFrequency
             };
 
             if (request.HasAlert)
@@ -89,6 +90,7 @@ namespace AssetControl.Api.Controllers
             device.Channel = request.Channel;
             device.MeasureTypeCode = request.MeasureTypeCode;
             device.NotificationGroupId = request.NotificationGroupId;
+            device.StateNotificationFrequency = request.StateNotificationFrequency;
 
             if (request.MeasureProperties != null && request.MeasureProperties.Any())
             {

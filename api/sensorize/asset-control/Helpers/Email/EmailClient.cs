@@ -2,11 +2,11 @@
 
 namespace Sensorize.Api.Helpers.Email
 {
-    public class EmailSender : IEmailSender
+    public class EmailClient : IEmailClient
     {
         private readonly IFluentEmail _email;
 
-        public EmailSender(IFluentEmail email) => _email = email;
+        public EmailClient(IFluentEmail email) => _email = email;
 
         public async Task<bool> SendAsync(EmailRequest request)
         {
