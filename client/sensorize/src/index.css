@@ -1,0 +1,24 @@
+html,
+body {
+  font-size: 16px;
+}
+
+*,
+html,
+input::-webkit-input-placeholder {
+  font-family: "Inter", sans-serif;
+  font-style: normal;
+  box-sizing: border-box;
+}
+
+/* Overrides chakra sizing logic. Removes the need to add size to every heading and enforces to use html semantics ("as" prop) on Chakra */
+h1 { font-size: 2rem !important; }
+h2 { font-size: 1.5rem !important; }
+h3 { font-size: 1.125rem !important; }
+h4 { font-size: 1rem !important; }
+h5 { font-size: 0.875rem !important; }
+h6 { font-size: 0.75rem !important; }
+
+.debug {
+  border: 1px dashed red;
+}
