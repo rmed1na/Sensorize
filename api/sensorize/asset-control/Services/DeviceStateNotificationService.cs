@@ -117,12 +117,18 @@ namespace Sensorize.Api.Services
             ArgumentNullException.ThrowIfNull(_deviceRepository);
 
             if (!state.Device.StateNotificationFrequency.HasValue)
+            {
+                if (state.NextStateNotification.HasValue)
+                {
+                    state.NextStateNotification = null;
+                    await _deviceRepository.SaveAsync(state);
+                }
+
                 return;
+            }
 
-            var lastTime = state.LastStateNotification ?? DateTime.Now.AddMinutes(state.Device.StateNotificationFrequency.Value * -1);
-            var nextTime = lastTime.AddMinutes(state.Device.StateNotificationFrequency.Value);
-
-            if (nextTime < DateTime.Now)
+            var nextTime = state.NextStateNotification ?? DateTime.Now.AddSeconds(-1);
+            if (nextTime <= DateTime.Now)
             {
                 var recipients = state.Device.NotificationGroup?.Recipients?.Where(r => r.StatusCode == GlobalStatusCode.Active);
 
@@ -141,6 +147,7 @@ namespace Sensorize.Api.Services
                 }
 
                 state.LastStateNotification = DateTime.Now;
+                state.NextStateNotification = DateTime.Now.AddMinutes(state.Device.StateNotificationFrequency.Value);
                 await _deviceRepository.SaveAsync(state);
             }
         }
