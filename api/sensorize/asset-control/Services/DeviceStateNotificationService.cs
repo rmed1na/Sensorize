@@ -148,7 +148,7 @@ namespace Sensorize.Api.Services
 
                 state.LastStateNotification = DateTime.Now;
                 state.NextStateNotification = DateTime.Now.AddMinutes(state.Device.StateNotificationFrequency.Value);
-                await _deviceRepository.SaveAsync(state);
+                await _deviceRepository.SaveAsync(state, false);
             }
         }
     }
