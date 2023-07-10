@@ -26,7 +26,7 @@ import '@fontsource/rubik/900.css'
 import theme from './utils/theme'
 import App from './App'
 import Home from './pages/home/Home'
-import Devices from './pages/devices/Devices'
+import Sensors from './pages/sensors/Sensors'
 import NotificationGroups from './pages/notifications/Groups';
 import NotificationRecipient from './pages/notifications/Recipients';
 // CSS
@@ -42,7 +42,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path='/' element={<App />} />
           <Route path='/login' element={<App />} />
           <Route path='/home' element={<Home />} />
-          <Route path='/device' element={<Devices />} />
+          <Route path='/sensor' element={<Sensors />} />
           <Route path='/notification/group' element={<NotificationGroups />} />
           <Route path='/notification/recipient' element={<NotificationRecipient />} />
         </Routes>

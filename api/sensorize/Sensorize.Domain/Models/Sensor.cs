@@ -3,9 +3,9 @@ using Sensorize.Domain.Models.Meta;
 
 namespace Sensorize.Domain.Models
 {
-    public class Device : BaseModel
+    public class Sensor : BaseModel
     {
-        public int DeviceId { get; set; }
+        public int SensorId { get; set; }
         public string Name { get; set; } = string.Empty;
         public GlobalStatusCode StatusCode { get; set; }
         public MeasureTypeCode MeasureTypeCode { get; set; }
@@ -18,10 +18,10 @@ namespace Sensorize.Domain.Models
         public int? NotificationGroupId { get; set; }
         public int? StateNotificationFrequency { get; set; }
 
-        public virtual ICollection<DeviceMeasureProperty>? MeasureProperties { get; set; }
+        public virtual ICollection<SensorMeasureProperty>? MeasureProperties { get; set; }
         public virtual NotificationGroup? NotificationGroup { get; set; }
 
-        public DeviceMeasureProperty? GetMeasureProperty(string name)
+        public SensorMeasureProperty? GetMeasureProperty(string name)
         {
             if (MeasureProperties != null && MeasureProperties.Any())
                 return MeasureProperties.FirstOrDefault(x => x.PropertyCode.ToLower() == name.ToLower());

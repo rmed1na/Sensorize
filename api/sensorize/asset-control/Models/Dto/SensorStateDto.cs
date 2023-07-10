@@ -6,41 +6,41 @@ using System.Globalization;
 
 namespace Sensorize.Api.Models.Dto
 {
-	public class DeviceStateDto
+	public class SensorStateDto
 	{
-		public DeviceDto Device { get; set; }
+		public SensorDto Sensor { get; set; }
 		public double? Measurement { get; set; }
 		public string? Description { get; set; }
 		public DateTime LastUpdate { get; set; }
 		public string? TimeSpanDescription { get; set; }
 		public bool IsOnAlert { get; }
 
-		public DeviceStateDto(DeviceState state)
+		public SensorStateDto(SensorState state)
 		{
-            ArgumentNullException.ThrowIfNull(state.Device);
+            ArgumentNullException.ThrowIfNull(state.Sensor);
 
-            Device = new DeviceDto(state.Device);
+            Sensor = new SensorDto(state.Sensor);
 			Measurement = state.Measurement;
 			Description = state.Description;
 			LastUpdate = state.UpdatedDate ?? state.CreatedDate;
 			TimeSpanDescription = (DateTime.Now - LastUpdate).Humanize(culture: new CultureInfo("es"));
 
-			if (state.Device.HasAlert)
+			if (state.Sensor.HasAlert)
 			{
-				switch (state.Device.MeasureTypeCode)
+				switch (state.Sensor.MeasureTypeCode)
 				{
 					case MeasureTypeCode.Volume:
-						if (double.TryParse(state.Device.GetMeasureProperty(MeasurePropertyCode.VolumeMaxCapacity)?.PropertyValue, out double maxCap))
+						if (double.TryParse(state.Sensor.GetMeasureProperty(MeasurePropertyCode.VolumeMaxCapacity)?.PropertyValue, out double maxCap))
 						{
 							var currentRatio = state.Measurement / maxCap;
-							if (currentRatio <= state.Device.AlertMinRatio)
+							if (currentRatio <= state.Sensor.AlertMinRatio)
 								IsOnAlert = true;
 						}
 						break;
 					case MeasureTypeCode.Binary:
 						var value = state.Measurement == 1d;
 						
-						if (bool.TryParse(state.Device.AlertOn, out bool trigger) && value == trigger)
+						if (bool.TryParse(state.Sensor.AlertOn, out bool trigger) && value == trigger)
 						{
 							IsOnAlert = true;
 						}

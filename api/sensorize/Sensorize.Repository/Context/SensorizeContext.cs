@@ -5,10 +5,10 @@ namespace Sensorize.Repository.Context
 {
 	public class SensorizeContext : DbContext, ISensorizeContext
 	{
-		public DbSet<Device> Devices => Set<Device>();
-		public DbSet<DeviceType> DeviceTypes => Set<DeviceType>();
-		public DbSet<DeviceMeasureProperty> DeviceMeasureProperties => Set<DeviceMeasureProperty>();
-		public DbSet<DeviceState> DeviceStates => Set<DeviceState>();
+		public DbSet<Sensor> Sensors => Set<Sensor>();
+		public DbSet<SensorType> SensorTypes => Set<SensorType>();
+		public DbSet<SensorMeasureProperty> SensorMeasureProperties => Set<SensorMeasureProperty>();
+		public DbSet<SensorState> SensorStates => Set<SensorState>();
 		public DbSet<NotificationGroup> NotificationGroups => Set<NotificationGroup>();
 		public DbSet<NotificationRecipient> NotificationRecipients => Set<NotificationRecipient>();
 

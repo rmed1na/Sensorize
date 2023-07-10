@@ -19,8 +19,8 @@ import {
 } from 'react-icons/md';
 
 export default function MeasureType({
-    device,
-    setDevice
+    sensor,
+    setSensor
 }) {
     const measureOptions = [
         {
@@ -49,10 +49,10 @@ export default function MeasureType({
     };
 
     const safePropertyValue = (code) => {
-        if (!device || !device.measureProperties || device.measureProperties.length == 0)
+        if (!sensor || !sensor.measureProperties || sensor.measureProperties.length == 0)
             return '';
 
-        let prop = device.measureProperties.find(x => x.code == code);
+        let prop = sensor.measureProperties.find(x => x.code == code);
         if (prop) {
             return prop.value;
         }
@@ -60,10 +60,10 @@ export default function MeasureType({
         return '';
     };
 
-    const handleMeasureTypeChange = (e) => setDevice({ ...device, measureTypeCode: e.value });
+    const handleMeasureTypeChange = (e) => setSensor({ ...sensor, measureTypeCode: e.value });
     const handleMeasurePropChange = (code, value) => {
         let exists = false;
-        let updatedProps = device?.measureProperties?.map(p => {
+        let updatedProps = sensor?.measureProperties?.map(p => {
             if (p.code == code) {
                 exists = true;
                 return { ...p, value: value };
@@ -75,11 +75,11 @@ export default function MeasureType({
             updatedProps.push({ code: code, value: value });
         }
 
-        setDevice({ ...device, measureProperties: updatedProps });
+        setSensor({ ...sensor, measureProperties: updatedProps });
     }
     const measureTypeDetails = () => {
         let component;
-        switch (device?.measureTypeCode) {
+        switch (sensor?.measureTypeCode) {
             case 1: // Volume
                 component = (
                     <Flex>
@@ -140,7 +140,7 @@ export default function MeasureType({
                                 components={customComponents}
                                 onChange={e => handleMeasureTypeChange(e)}
                                 colorScheme="brand"
-                                value={measureOptions.find(m => m.value == device?.measureTypeCode)} />
+                                value={measureOptions.find(m => m.value == sensor?.measureTypeCode)} />
                         </FormControl>
                         {measureTypeDetails()}
                     </AccordionPanel>

@@ -18,9 +18,9 @@ import MeasureTypeSection from './sections/MeasureType';
 import AlertSection from './sections/Alert';
 import NotificationsSection from './sections/Notifications';
 
-export default function DeviceDetails({
-    device,
-    setDevice,
+export default function SensorDetails({
+    sensor,
+    setSensor,
     onDataSave
 }) {
     const toast = useToast();
@@ -32,13 +32,13 @@ export default function DeviceDetails({
     }
 
     async function upsert() {
-        // New device
-        if (!device || !device.deviceId || device.deviceId == 0) {
-            let response = await api.resources.device.create(
-                device,
+        // New sensor
+        if (!sensor || !sensor.sensorId || sensor.sensorId == 0) {
+            let response = await api.resources.sensor.create(
+                sensor,
                 function () {
                     toast({
-                        title: 'Dispositivo guardado',
+                        title: 'Sensor guardado',
                         status: 'success',
                         duration: 5000,
                         isClosable: true,
@@ -58,14 +58,14 @@ export default function DeviceDetails({
                     })
                 });
 
-            setDevice(response);
+            setSensor(response);
         }
 
-        // Update device
-        if (device && device.deviceId > 0) {
-            let response = await api.resources.device.update(device, function () {
+        // Update sensor
+        if (sensor && sensor.sensorId > 0) {
+            let response = await api.resources.sensor.update(sensor, function () {
                 toast({
-                    title: 'Dispositivo actualizado',
+                    title: 'Sensor actualizado',
                     status: 'success',
                     duration: 5000,
                     isClosable: true,
@@ -75,14 +75,14 @@ export default function DeviceDetails({
                 onDataSave();
             });
 
-            setDevice(response);
+            setSensor(response);
         }
     }
 
     useEffect(() => {
         // Default values
-        if (!device) {
-            setDevice({
+        if (!sensor) {
+            setSensor({
                 name: '',
                 topic: '',
                 channel: '',
@@ -98,23 +98,23 @@ export default function DeviceDetails({
             <Flex direction="column" gap={4} mb={5}>
                 <Flex>
                     <Text w="12rem" color="blackAlpha.700">Id:</Text>
-                    <Text>{device?.deviceId}</Text>
+                    <Text>{sensor?.sensorId}</Text>
                 </Flex>
                 <Flex>
                     <Text w="12rem" color="blackAlpha.700">Creación:</Text>
-                    <Text>{device?.createdDate ? dateUtil.toReadableString(device.createdDate) : null}</Text>
+                    <Text>{sensor?.createdDate ? dateUtil.toReadableString(sensor.createdDate) : null}</Text>
                 </Flex>
                 <Flex>
                     <Text w="12rem" color="blackAlpha.700">Última actualización:</Text>
-                    <Text>{device?.updatedDate ? dateUtil.toReadableString(device.updatedDate) : null}</Text>
+                    <Text>{sensor?.updatedDate ? dateUtil.toReadableString(sensor.updatedDate) : null}</Text>
                 </Flex>
             </Flex>
             <Accordion allowToggle defaultIndex={[0]} position="relative">
-                <GeneralSection device={device} setDevice={setDevice} />
-                <MessageBrokerSection device={device} setDevice={setDevice} />
-                <MeasureTypeSection device={device} setDevice={setDevice} />
-                <NotificationsSection device={device} setDevice={setDevice} notificationGroups={notificationGroups} />
-                <AlertSection device={device} setDevice={setDevice} />
+                <GeneralSection sensor={sensor} setSensor={setSensor} />
+                <MessageBrokerSection sensor={sensor} setSensor={setSensor} />
+                <MeasureTypeSection sensor={sensor} setSensor={setSensor} />
+                <NotificationsSection sensor={sensor} setSensor={setSensor} notificationGroups={notificationGroups} />
+                <AlertSection sensor={sensor} setSensor={setSensor} />
             </Accordion>
             <Flex gap={2} justify="flex-end" my={5}>
                 <Button size="sm" onClick={upsert}>Guardar</Button>

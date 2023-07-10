@@ -86,7 +86,7 @@ try
 
     builder.Services
         .AddDependencyInjection()
-        .AddHostedService<DeviceStateNotificationService>();
+        .AddHostedService<SensorStateNotificationService>();
     #endregion
 
     Log.Information("Setting up app...");
@@ -112,7 +112,7 @@ try
     });
     //}
 
-    await new DeviceStatusListener(app.Services).ListenAsync();
+    await new SensorStatusListener(app.Services).ListenAsync();
     app.UseHttpsRedirection();
     app.UseAuthorization();
     app.MapControllers();

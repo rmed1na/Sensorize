@@ -27,6 +27,8 @@ export default function Login() {
 
         if (email == "admin@company.com" && password == "Password@123")
             navigation('/home');
+        else
+            alert('Invalid credentials');
     }
 
     return (

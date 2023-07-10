@@ -9,17 +9,17 @@ using System.Text.Json;
 
 namespace AssetControl.Api.EventListeners
 {
-    public class DeviceStatusListener
+    public class SensorStatusListener
     {
         private readonly MqttFactory _mqttFactory;
         private readonly IMqttClient _mqttClient;
         private readonly IMemoryCache _cache;
-        private readonly IDeviceRepository _deviceRepository;
+        private readonly ISensorRepository _sensorRepository;
         private readonly ApiSettings _settings;
 
-        public static string StreamKey => "sensorize_device_status";
+        public static string StreamKey => "sensorize_sensor_status";
 
-        public DeviceStatusListener(IServiceProvider serviceProvider)
+        public SensorStatusListener(IServiceProvider serviceProvider)
         {
             var scope = serviceProvider.CreateScope();
 
@@ -27,7 +27,7 @@ namespace AssetControl.Api.EventListeners
             _mqttClient = serviceProvider.GetRequiredService<IMqttClient>();
             _cache = serviceProvider.GetRequiredService<IMemoryCache>();
             _settings = serviceProvider.GetRequiredService<ApiSettings>();
-            _deviceRepository = scope.ServiceProvider.GetRequiredService<IDeviceRepository>();
+            _sensorRepository = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
         }
 
         public async Task ListenAsync()
@@ -36,15 +36,15 @@ namespace AssetControl.Api.EventListeners
             _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
                 Console.WriteLine($"New message received on topic: {e.ApplicationMessage.Topic} at {DateTime.Now}");
-                var device = await _deviceRepository.GetAsync(e.ApplicationMessage.Topic);
+                var sensor = await _sensorRepository.GetAsync(e.ApplicationMessage.Topic);
 
-                if (device != null)
+                if (sensor != null)
                 {
                     var data = JsonSerializer.Deserialize<Dictionary<string, object>>(e.ApplicationMessage.ConvertPayloadToString());
                     if (data == null || !data.Any())
                         return;
 
-                    data.TryGetValue(device.Channel!, out object? measurementObj);
+                    data.TryGetValue(sensor.Channel!, out object? measurementObj);
                     if (measurementObj == null)
                         return;
 
@@ -53,27 +53,27 @@ namespace AssetControl.Api.EventListeners
                     var isBool = bool.TryParse(measurementStr, out bool measurementBool);
                     if (!string.IsNullOrEmpty(measurementStr))
                     {
-                        DeviceState? state = null;
+                        SensorState? state = null;
 
                         if (isBool)
-                            state = DeviceStateHandler.ComputeMeasurement(device, measurementBool);
+                            state = SensorStateHandler.ComputeMeasurement(sensor, measurementBool);
                         if (isDouble)
-                            state = DeviceStateHandler.ComputeMeasurement(device, measurementDouble);
+                            state = SensorStateHandler.ComputeMeasurement(sensor, measurementDouble);
 
                         ArgumentNullException.ThrowIfNull(state);
-                        await _deviceRepository.UpsertState(state);
+                        await _sensorRepository.UpsertState(state);
                     }
                 }
             };
 
-            var devices = await _deviceRepository.GetAllAsync();
-            if (devices == null || !devices.Any())
+            var sensors = await _sensorRepository.GetAllAsync();
+            if (sensors == null || !sensors.Any())
             {
-                Console.WriteLine("No devices to subscribe to");
+                Console.WriteLine("No sensors to subscribe to");
                 return;
             }
 
-            foreach (var topic in devices.Where(d => d.Topic != null).Select(d => d.Topic))
+            foreach (var topic in sensors.Where(d => d.Topic != null).Select(d => d.Topic))
                 await SubscribeToTopicAsync(_mqttFactory, _mqttClient, topic!);
         }
 

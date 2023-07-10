@@ -11,8 +11,8 @@ namespace Sensorize.Api
             #region Scoped
             services.AddScoped<IEmailClient, EmailClient>();
             services.AddScoped<ISensorizeContext, SensorizeContext>();
-            services.AddScoped<IDeviceRepository, DeviceRepository>();
-            services.AddScoped<IDeviceTypeRepository, DeviceTypeRepository>();
+            services.AddScoped<ISensorRepository, SensorRepository>();
+            services.AddScoped<ISensorTypeRepository, SensorTypeRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             #endregion
 

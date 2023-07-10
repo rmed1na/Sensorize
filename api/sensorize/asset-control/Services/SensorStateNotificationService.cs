@@ -6,16 +6,16 @@ using Sensorize.Repository.Repository;
 
 namespace Sensorize.Api.Services
 {
-    public class DeviceStateNotificationService : BackgroundService
+    public class SensorStateNotificationService : BackgroundService
     {
         private const int MAX_MINUTES_WAIT_TO_ALERT = 5;
         private const int MINUTES_CYCLE_INTERVAL = 1;
         private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
-        private IDeviceRepository? _deviceRepository;
+        private ISensorRepository? _sensorRepository;
         private IEmailClient? _emailClient;
 
-        public DeviceStateNotificationService(IServiceProvider serviceProvider, ILogger<DeviceStateNotificationService> logger)
+        public SensorStateNotificationService(IServiceProvider serviceProvider, ILogger<SensorStateNotificationService> logger)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -33,10 +33,10 @@ namespace Sensorize.Api.Services
                         .ConfigureAwait(false);
 
                     using var scope = _serviceProvider.CreateScope();
-                    _deviceRepository = scope.ServiceProvider.GetRequiredService<IDeviceRepository>();
+                    _sensorRepository = scope.ServiceProvider.GetRequiredService<ISensorRepository>();
                     _emailClient = scope.ServiceProvider.GetRequiredService<IEmailClient>();
 
-                    var states = await _deviceRepository
+                    var states = await _sensorRepository
                         .GetStatesAsync()
                         .ConfigureAwait(false);
 
@@ -46,35 +46,35 @@ namespace Sensorize.Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error on {nameof(DeviceStateNotificationService)}.{nameof(this.ExecuteAsync)}");
+                _logger.LogError(ex, $"Error on {nameof(SensorStateNotificationService)}.{nameof(this.ExecuteAsync)}");
                 throw;
             }
         }
 
-        private async Task HandleNotificationsAsync(DeviceState state)
+        private async Task HandleNotificationsAsync(SensorState state)
         {
-            var dto = new DeviceStateDto(state);
+            var dto = new SensorStateDto(state);
 
             await HandleAlertNotificationAsync(dto, state);
             await HandleStateNotificationAsync(state);
         }
 
-        private async Task HandleAlertNotificationAsync(DeviceStateDto dto, DeviceState state)
+        private async Task HandleAlertNotificationAsync(SensorStateDto dto, SensorState state)
         {
-            ArgumentNullException.ThrowIfNull(_deviceRepository);
+            ArgumentNullException.ThrowIfNull(_sensorRepository);
             ArgumentNullException.ThrowIfNull(_emailClient);
 
             if (dto.IsOnAlert && !state.AlertStateBegin.HasValue)
             {
                 state.AlertStateBegin = DateTime.Now;
                 state.AlertStateEnd = null;
-                await _deviceRepository.SaveAsync(state, false);
+                await _sensorRepository.SaveAsync(state, false);
             }
             else if (!dto.IsOnAlert && state.AlertStateBegin.HasValue)
             {
                 state.AlertStateBegin = null;
                 state.IsNotified = false;
-                await _deviceRepository.SaveAsync(state, false);
+                await _sensorRepository.SaveAsync(state, false);
             }
             else if (dto.IsOnAlert && state.AlertStateBegin.HasValue)
             {
@@ -84,19 +84,19 @@ namespace Sensorize.Api.Services
 
                 if (!state.IsNotified)
                 {
-                    var deviceName = state.Device?.Name;
-                    var recipients = state.Device?.NotificationGroup?.Recipients?.Where(r => r.StatusCode == GlobalStatusCode.Active);
+                    var name = state.Sensor?.Name;
+                    var recipients = state.Sensor?.NotificationGroup?.Recipients?.Where(r => r.StatusCode == GlobalStatusCode.Active);
                     foreach (var recipient in recipients ?? Enumerable.Empty<NotificationRecipient>())
                     {
                         await _emailClient
                             .SendAsync(new EmailRequest
                             {
                                 To = recipient?.Email,
-                                Subject = $"Alerta de dispositivo {deviceName}",
+                                Subject = $"Alerta de dispositivo {name}",
                                 BodyText =
-                                    $"El dispositivo {deviceName} ha estado en un estado de alerta por más de 5 minutos.\n\n" +
+                                    $"El dispositivo {name} ha estado en un estado de alerta por más de 5 minutos.\n\n" +
                                     $"Detalles:\n" +
-                                    $"Dispositivo: {deviceName}\n" +
+                                    $"Dispositivo: {name}\n" +
                                     $"Medida: {state.Description}\n" +
                                     $"Desde: {state.AlertStateBegin}\n" +
                                     $"Última actualización hace: {dto.TimeSpanDescription}\n"
@@ -105,23 +105,23 @@ namespace Sensorize.Api.Services
 
                     state.AlertStateEnd = DateTime.Now;
                     state.IsNotified = true;
-                    await _deviceRepository.SaveAsync(state, false);
+                    await _sensorRepository.SaveAsync(state, false);
                 }
             }
         }
 
-        private async Task HandleStateNotificationAsync(DeviceState state)
+        private async Task HandleStateNotificationAsync(SensorState state)
         {
-            ArgumentNullException.ThrowIfNull(state.Device);
+            ArgumentNullException.ThrowIfNull(state.Sensor);
             ArgumentNullException.ThrowIfNull(_emailClient);
-            ArgumentNullException.ThrowIfNull(_deviceRepository);
+            ArgumentNullException.ThrowIfNull(_sensorRepository);
 
-            if (!state.Device.StateNotificationFrequency.HasValue)
+            if (!state.Sensor.StateNotificationFrequency.HasValue)
             {
                 if (state.NextStateNotification.HasValue)
                 {
                     state.NextStateNotification = null;
-                    await _deviceRepository.SaveAsync(state);
+                    await _sensorRepository.SaveAsync(state);
                 }
 
                 return;
@@ -130,25 +130,25 @@ namespace Sensorize.Api.Services
             var nextTime = state.NextStateNotification ?? DateTime.Now.AddSeconds(-1);
             if (nextTime <= DateTime.Now)
             {
-                var recipients = state.Device.NotificationGroup?.Recipients?.Where(r => r.StatusCode == GlobalStatusCode.Active);
+                var recipients = state.Sensor.NotificationGroup?.Recipients?.Where(r => r.StatusCode == GlobalStatusCode.Active);
 
                 foreach (var recipient in recipients ?? Enumerable.Empty<NotificationRecipient>())
                 {
                     await _emailClient.SendAsync(new EmailRequest
                     {
                         To = recipient?.Email,
-                        Subject = $"Estado del dispositivo {state.Device.Name}",
-                        BodyText = $"Notificación del estado del dispositivo {state.Device.Name}.\n\n" +
+                        Subject = $"Estado del dispositivo {state.Sensor.Name}",
+                        BodyText = $"Notificación del estado del dispositivo {state.Sensor.Name}.\n\n" +
                                    $"Detalles:\n" + 
-                                   $"Dispositivo: {state.Device.Name}\n" + 
+                                   $"Dispositivo: {state.Sensor.Name}\n" + 
                                    $"Estado: {state.Description}\n" + 
                                    $"Última actualización: {state.UpdatedDate}"
                     }).ConfigureAwait(false);
                 }
 
                 state.LastStateNotification = DateTime.Now;
-                state.NextStateNotification = DateTime.Now.AddMinutes(state.Device.StateNotificationFrequency.Value);
-                await _deviceRepository.SaveAsync(state);
+                state.NextStateNotification = DateTime.Now.AddMinutes(state.Sensor.StateNotificationFrequency.Value);
+                await _sensorRepository.SaveAsync(state, false);
             }
         }
     }

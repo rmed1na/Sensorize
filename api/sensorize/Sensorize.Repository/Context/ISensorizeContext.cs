@@ -5,10 +5,10 @@ namespace Sensorize.Repository.Context
 {
     public interface ISensorizeContext
     {
-        DbSet<Device> Devices { get; }
-        DbSet<DeviceType> DeviceTypes { get; }
-        DbSet<DeviceMeasureProperty> DeviceMeasureProperties { get; }
-        DbSet<DeviceState> DeviceStates { get; }
+        DbSet<Sensor> Sensors { get; }
+        DbSet<SensorType> SensorTypes { get; }
+        DbSet<SensorMeasureProperty> SensorMeasureProperties { get; }
+        DbSet<SensorState> SensorStates { get; }
         DbSet<NotificationGroup> NotificationGroups { get; }
         DbSet<NotificationRecipient> NotificationRecipients { get; }
 

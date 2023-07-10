@@ -16,25 +16,25 @@ import {
 } from "@chakra-ui/react";
 
 export default function Notifications({
-    device,
-    setDevice,
+    sensor,
+    setSensor,
     notificationGroups
 }) {
     const [notifyState, setNotifyState] = useState(false);
-    const handleNotificationGroupChange = (e) => setDevice({ ...device, notificationGroupId: e.target.value });
-    const handleStateNotificationFrequencyChange = (e) => setDevice({ ...device, stateNotificationFrequency: e.target.value });
+    const handleNotificationGroupChange = (e) => setSensor({ ...sensor, notificationGroupId: e.target.value });
+    const handleStateNotificationFrequencyChange = (e) => setSensor({ ...sensor, stateNotificationFrequency: e.target.value });
     const handleHasStateNotificationChange = (e) => {
         let checked = e.target.checked;
         setNotifyState(checked);
 
         if (!checked) {
-            setDevice({ ...device, stateNotificationFrequency: null });
+            setSensor({ ...sensor, stateNotificationFrequency: null });
         }
     };
 
     useEffect(() => {
-        setNotifyState(device?.stateNotificationFrequency ? true : false);
-    }, [device]);
+        setNotifyState(sensor?.stateNotificationFrequency ? true : false);
+    }, [sensor]);
 
     return (
         <AccordionItem>
@@ -50,7 +50,7 @@ export default function Notifications({
                     <Select 
                         size='sm' 
                         placeholder='Selecciona un grupo'
-                        value={device?.notificationGroupId}
+                        value={sensor?.notificationGroupId}
                         onChange={e => handleNotificationGroupChange(e)}>
                         { notificationGroups && notificationGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>) }
                     </Select>
@@ -65,7 +65,7 @@ export default function Notifications({
                         <FormLabel>Minutos de frecuencia</FormLabel>
                         <Input 
                             type='number' 
-                            value={device?.stateNotificationFrequency ?? ''}
+                            value={sensor?.stateNotificationFrequency ?? ''}
                             onChange={e => handleStateNotificationFrequencyChange(e)} />
                     </FormControl>
                 </Box>
