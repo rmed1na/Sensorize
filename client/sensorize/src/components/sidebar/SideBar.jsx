@@ -14,7 +14,9 @@ import { RxDashboard } from 'react-icons/rx';
 import {
     MdNotificationsNone,
     MdOutlineGroup,
-    MdOutlineRecordVoiceOver
+    MdOutlineRecordVoiceOver,
+    MdOutlineMonitorHeart,
+    MdSensors
 } from 'react-icons/md';
 // CC
 import SideBarItem from './SideBarItem';
@@ -29,7 +31,13 @@ export default function SideBar() {
         {
             title: 'Dispositivos',
             icon: BiChip,
-            to: '/device'
+            children: [
+                {
+                    title: 'Sensores',
+                    icon: MdSensors,
+                    to: '/sensor'
+                }
+            ]
         },
         {
             title: 'Notificaciones',

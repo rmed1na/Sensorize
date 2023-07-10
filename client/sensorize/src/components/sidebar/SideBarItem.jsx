@@ -39,9 +39,12 @@ export default function SideBarItem({
                     color={isSelected ? '#fff' : 'blackAlpha.700'}
                     bg={isSelected ? 'brand.600' : 'inherit'}
                     borderRadius="md"
-                    mb={ isChild ? 1 : 0 }
+                    my={ isChild ? 1 : 0 }
                     height={ isChild ? '2rem' : 'initial' }
-                    _hover={{ color: (isSelected ? useColorModeValue('brand.700') : 'inherit'), bg: useColorModeValue('brand.100') }}>
+                    _hover={{ 
+                        color: isSelected ? useColorModeValue('#fff') : 'inherit', 
+                        bg: isSelected ? useColorModeValue('brand.600') : useColorModeValue('blackAlpha.100') 
+                    }}>
                     {linkIcon && (<Icon as={linkIcon} />)}
                     <Text fontSize="0.875rem" fontWeight={500}>{titleText}</Text>
                 </Flex>

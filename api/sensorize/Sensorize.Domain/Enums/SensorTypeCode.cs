@@ -1,6 +1,6 @@
 ﻿namespace Sensorize.Domain.Enums
 {
-    public enum DeviceTypeCode
+    public enum SensorTypeCode
     {
         Unknown = 0,
         Binary,

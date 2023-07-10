@@ -19,14 +19,14 @@ import {
 } from "@chakra-ui/react"
 
 export default function Alert({
-    device,
-    setDevice
+    sensor,
+    setSensor
 }) {
     const handleHasAlertChange = (e) => {
-        if (!device?.measureTypeCode) {
+        if (!sensor?.measureTypeCode) {
             toast({
-                title: 'Missing device type',
-                description: 'Please select a device type so that alert properties can be properly choosen',
+                title: 'Missing sensor type',
+                description: 'Please select a sensor type so that alert properties can be properly choosen',
                 status: 'warning',
                 duration: 5000,
                 isClosable: true,
@@ -35,19 +35,19 @@ export default function Alert({
             return;
         }
 
-        setDevice({ ...device, hasAlert: e.target.checked })
+        setSensor({ ...sensor, hasAlert: e.target.checked })
     };
 
     const handleAlertLevel = (e, bound) => {
         switch (bound) {
             case 'min':
-                setDevice({ ...device, alertMinLevel: e });
+                setSensor({ ...sensor, alertMinLevel: e });
                 break;
             case 'max':
-                setDevice({ ...device, alertMaxLevel: e });
+                setSensor({ ...sensor, alertMaxLevel: e });
                 break;
             case 'on':
-                setDevice({ ...device, alertOn: e });
+                setSensor({ ...sensor, alertOn: e });
                 break;
             default:
                 break;
@@ -57,14 +57,14 @@ export default function Alert({
     const alertTypeDetails = () => {
         let component;
         
-        switch (device?.measureTypeCode) {
+        switch (sensor?.measureTypeCode) {
             case 1: // Volume
                 component = (
                     <>
                         <FormControl py={2}>
-                            <FormLabel>Nivel de alerta: {device?.alertMinLevel ?? '0'}%</FormLabel>
+                            <FormLabel>Nivel de alerta: {sensor?.alertMinLevel ?? '0'}%</FormLabel>
                             <Slider
-                                defaultValue={device?.alertMinLevel ?? 0}
+                                defaultValue={sensor?.alertMinLevel ?? 0}
                                 min={0}
                                 max={100}
                                 step={1}
@@ -86,7 +86,7 @@ export default function Alert({
                 break;
             case 3: // Binary
                 component = (<>
-                    <RadioGroup onChange={e => handleAlertLevel(e, 'on')} value={device?.alertOn}>
+                    <RadioGroup onChange={e => handleAlertLevel(e, 'on')} value={sensor?.alertOn}>
                         <Stack direction='column'>
                             <Radio size='sm' value="true">Cuando el valor es cierto</Radio>
                             <Radio size='sm' value="false">Cuando el valor es falso</Radio>
@@ -113,9 +113,9 @@ export default function Alert({
                     <AccordionPanel>
                         <FormControl py={2} display='flex'>
                             <FormLabel>Tiene alerta?</FormLabel>
-                            <Switch onChange={e => handleHasAlertChange(e)} isChecked={device?.hasAlert} />
+                            <Switch onChange={e => handleHasAlertChange(e)} isChecked={sensor?.hasAlert} />
                         </FormControl>
-                        {device?.hasAlert && alertTypeDetails()}
+                        {sensor?.hasAlert && alertTypeDetails()}
                     </AccordionPanel>
                 </AccordionItem>
         </>

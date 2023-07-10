@@ -8,36 +8,36 @@ namespace Sensorize.Repository
     {
         public static void Apply(ModelBuilder builder)
         {
-            builder.Entity<Device>(e =>
+            builder.Entity<Sensor>(e =>
             {
-                e.ToTable("devices");
-                e.HasKey(x => x.DeviceId);
-                e.Property(x => x.DeviceId).UseMySQLAutoIncrementColumn("int");
-                e.HasMany(x => x.MeasureProperties).WithOne(x => x.Device);
+                e.ToTable("sensors");
+                e.HasKey(x => x.SensorId);
+                e.Property(x => x.SensorId).UseMySQLAutoIncrementColumn("int");
+                e.HasMany(x => x.MeasureProperties).WithOne(x => x.Sensor);
                 e.HasOne(x => x.NotificationGroup).WithMany().HasForeignKey(x => x.NotificationGroupId);
             });
 
-            builder.Entity<DeviceType>(e =>
+            builder.Entity<SensorType>(e =>
             {
-                e.ToTable("device_types");
-                e.HasKey(x => x.DeviceTypeId);
-                e.Property(x => x.DeviceTypeId).UseMySQLAutoIncrementColumn("int");
+                e.ToTable("sensor_types");
+                e.HasKey(x => x.SensorTypeId);
+                e.Property(x => x.SensorTypeId).UseMySQLAutoIncrementColumn("int");
             });
 
-            builder.Entity<DeviceMeasureProperty>(e =>
+            builder.Entity<SensorMeasureProperty>(e =>
             {
-                e.ToTable("device_measure_properties");
-                e.HasKey(x => x.DeviceMeasurePropertyId);
-                e.Property(x => x.DeviceMeasurePropertyId).UseMySQLAutoIncrementColumn("int");
-                e.HasOne(x => x.Device).WithMany(x => x.MeasureProperties).HasForeignKey(x => x.DeviceId);
+                e.ToTable("sensor_measure_properties");
+                e.HasKey(x => x.SensorMeasurePropertyId);
+                e.Property(x => x.SensorMeasurePropertyId).UseMySQLAutoIncrementColumn("int");
+                e.HasOne(x => x.Sensor).WithMany(x => x.MeasureProperties).HasForeignKey(x => x.SensorId);
             });
 
-            builder.Entity<DeviceState>(e =>
+            builder.Entity<SensorState>(e =>
             {
-                e.ToTable("device_states");
-                e.HasKey(x => x.DeviceStateId);
-                e.Property(x => x.DeviceStateId).UseMySQLAutoIncrementColumn("int");
-                e.HasOne(x => x.Device).WithMany().HasForeignKey(x => x.DeviceId);
+                e.ToTable("sensor_states");
+                e.HasKey(x => x.SensorStateId);
+                e.Property(x => x.SensorStateId).UseMySQLAutoIncrementColumn("int");
+                e.HasOne(x => x.Sensor).WithMany().HasForeignKey(x => x.SensorId);
             });
 
             builder.Entity<NotificationGroup>(e =>

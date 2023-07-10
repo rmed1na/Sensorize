@@ -12,7 +12,7 @@ namespace Sensorize.Api.Models.Dto
 
 		public MeasurePropertyDto() { }
 
-		public MeasurePropertyDto(DeviceMeasureProperty measureProp)
+		public MeasurePropertyDto(SensorMeasureProperty measureProp)
 		{
 			Code = measureProp.PropertyCode;
 			Value = measureProp.PropertyValue;

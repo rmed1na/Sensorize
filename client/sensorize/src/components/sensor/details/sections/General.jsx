@@ -11,10 +11,10 @@ import {
 } from "@chakra-ui/react";
 
 export default function General({
-    device,
-    setDevice
+    sensor,
+    setSensor
 }) {
-    const handleNameChange = (e) => setDevice({ ...device, name: e.target.value });
+    const handleNameChange = (e) => setSensor({ ...sensor, name: e.target.value });
 
     return (
         <>
@@ -30,10 +30,10 @@ export default function General({
                 <FormControl py={2} isRequired>
                     <FormLabel>Nombre</FormLabel>
                     <Input
-                        placeholder="Nombre del dispositivo (tanque, planta, etc.)"
+                        placeholder="Nombre del sensor (temperatura, presión, lógico, etc.)"
                         type="text"
                         onChange={e => handleNameChange(e)}
-                        value={device?.name ?? ''} />
+                        value={sensor?.name ?? ''} />
                 </FormControl>
             </AccordionPanel>
         </AccordionItem>

@@ -7,19 +7,19 @@ namespace Sensorize.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DeviceTypeController : ControllerBase
+    public class SensorTypeController : ControllerBase
     {
-        private readonly IDeviceTypeRepository _deviceTypeRepository;
+        private readonly ISensorTypeRepository _sensorTypeRepository;
 
-        public DeviceTypeController(IDeviceTypeRepository deviceTypeRepository)
+        public SensorTypeController(ISensorTypeRepository sensorTypeRepository)
         {
-            _deviceTypeRepository = deviceTypeRepository;
+            _sensorTypeRepository = sensorTypeRepository;
         }
 
         [HttpGet]
         [Route("all")]
-        public async Task<ICollection<DeviceType>> GetAllAsync()
-            => await _deviceTypeRepository.GetAllAsync();
+        public async Task<ICollection<SensorType>> GetAllAsync()
+            => await _sensorTypeRepository.GetAllAsync();
 
         [HttpPost]
         [Route("new")]
@@ -30,14 +30,14 @@ namespace Sensorize.Api.Controllers
             if (measureCode == MeasureTypeCode.Unknown)
                 return BadRequest("Measure code can't be unknown (cero)");
 
-            var deviceType = new DeviceType
+            var type = new SensorType
             {
                 Name = name,
                 MeasureTypeCode = measureCode
             };
 
-            await _deviceTypeRepository.AddAsync(deviceType);
-            return Ok(deviceType);
+            await _sensorTypeRepository.AddAsync(type);
+            return Ok(type);
         }
     }
 }

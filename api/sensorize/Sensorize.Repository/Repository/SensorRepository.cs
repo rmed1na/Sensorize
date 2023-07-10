@@ -6,50 +6,50 @@ using Sensorize.Repository.Context;
 
 namespace Sensorize.Repository.Repository
 {
-    public class DeviceRepository : IDeviceRepository
+    public class SensorRepository : ISensorRepository
     {
         private readonly ISensorizeContext _ctx;
 
         public ISensorizeContext Context => _ctx;
 
-        public DeviceRepository(ISensorizeContext ctx) => _ctx = ctx;
+        public SensorRepository(ISensorizeContext ctx) => _ctx = ctx;
 
-        public async Task AddAsync(Device device)
+        public async Task AddAsync(Sensor sensor)
         {
-            await _ctx.Devices.AddAsync(device);
+            await _ctx.Sensors.AddAsync(sensor);
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task<Device?> GetAsync(int id)
-            => await _ctx.Devices
+        public async Task<Sensor?> GetAsync(int id)
+            => await _ctx.Sensors
                 .Include(x => x.MeasureProperties)
-                .FirstOrDefaultAsync(d => d.DeviceId == id);
+                .FirstOrDefaultAsync(d => d.SensorId == id);
 
-        public async Task<Device?> GetAsync(string topic)
-            => await _ctx.Devices
+        public async Task<Sensor?> GetAsync(string topic)
+            => await _ctx.Sensors
                 .Include(x => x.MeasureProperties)
                 .FirstOrDefaultAsync(x => x.Topic != null && x.Topic.ToLower() == topic.ToLower());
 
-        public async Task<ICollection<Device>> GetAllAsync(bool onlyActive = true)
+        public async Task<ICollection<Sensor>> GetAllAsync(bool onlyActive = true)
         {
-            return await _ctx.Devices
+            return await _ctx.Sensors
                 .Include(x => x.MeasureProperties)
                 .Where(x => !onlyActive || (onlyActive && x.StatusCode == GlobalStatusCode.Active))
                 .ToListAsync();
         }
 
-        public async Task<ICollection<DeviceState>> GetStatesAsync(bool onlyActive = true)
+        public async Task<ICollection<SensorState>> GetStatesAsync(bool onlyActive = true)
         {
-            return await _ctx.DeviceStates
-                .Include(x => x.Device!.MeasureProperties)
-                .Include(x => x.Device!.NotificationGroup.Recipients)
-                .Where(x => x.Device!.StatusCode == GlobalStatusCode.Active)
+            return await _ctx.SensorStates
+                .Include(x => x.Sensor!.MeasureProperties)
+                .Include(x => x.Sensor!.NotificationGroup.Recipients)
+                .Where(x => x.Sensor!.StatusCode == GlobalStatusCode.Active)
                 .ToListAsync();
         }
 
-		public async Task UpsertState(DeviceState state)
+		public async Task UpsertState(SensorState state)
         {
-            var oldState = await _ctx.DeviceStates.FirstOrDefaultAsync(x => x.DeviceId == state.DeviceId);
+            var oldState = await _ctx.SensorStates.FirstOrDefaultAsync(x => x.SensorId == state.SensorId);
             if (oldState != null)
             {
                 oldState.Measurement = state.Measurement;
@@ -59,14 +59,14 @@ namespace Sensorize.Repository.Repository
                 return;
             }
 
-            await _ctx.DeviceStates.AddAsync(state);
+            await _ctx.SensorStates.AddAsync(state);
             await _ctx.SaveChangesAsync();
         }
 
-        public async Task SaveAsync(BaseModel device, bool setUpdateTime = true)
+        public async Task SaveAsync(BaseModel sensor, bool setUpdateTime = true)
         {
             if (setUpdateTime)
-                device.SetUpdated();
+                sensor.SetUpdated();
             await _ctx.SaveChangesAsync();
         }
     }
