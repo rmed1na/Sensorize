@@ -4,9 +4,9 @@ using Sensorize.Utility.Extensions;
 
 namespace Sensorize.Api.Models.Dto
 {
-    public class DeviceDto
+    public class SensorDto
     {
-		public int DeviceId { get; set; }
+		public int SensorId { get; set; }
 		public string? Name { get; set; }
 		public DateTime CreatedDate { get; set; }
 		public DateTime? UpdatedDate { get; set; }
@@ -23,35 +23,35 @@ namespace Sensorize.Api.Models.Dto
 		public int? StateNotificationFrequency { get; set; }
 		public ICollection<MeasurePropertyDto> MeasureProperties { get; set; } = new List<MeasurePropertyDto>();
 
-		public DeviceDto() { }
+		public SensorDto() { }
 
-		public DeviceDto(Device device)
+		public SensorDto(Sensor sensor)
 		{
-			DeviceId = device.DeviceId;
-			Name = device.Name;
-			CreatedDate = device.CreatedDate;
-			UpdatedDate = device.UpdatedDate;
-			MeasureTypeCode = device.MeasureTypeCode;
-			MeasureType = device.MeasureTypeCode.GetDisplayName();
-			IsActive = device.StatusCode == GlobalStatusCode.Active;
-			Topic = device.Topic;
-			Channel = device.Channel;
-			NotificationGroupId = device.NotificationGroupId;
-			StateNotificationFrequency = device.StateNotificationFrequency;
+			SensorId = sensor.SensorId;
+			Name = sensor.Name;
+			CreatedDate = sensor.CreatedDate;
+			UpdatedDate = sensor.UpdatedDate;
+			MeasureTypeCode = sensor.MeasureTypeCode;
+			MeasureType = sensor.MeasureTypeCode.GetDisplayName();
+			IsActive = sensor.StatusCode == GlobalStatusCode.Active;
+			Topic = sensor.Topic;
+			Channel = sensor.Channel;
+			NotificationGroupId = sensor.NotificationGroupId;
+			StateNotificationFrequency = sensor.StateNotificationFrequency;
 
-			if (device.MeasureProperties != null && device.MeasureProperties.Any())
+			if (sensor.MeasureProperties != null && sensor.MeasureProperties.Any())
 			{
 				MeasureProperties = new List<MeasurePropertyDto>();
-				foreach (var mprop in device.MeasureProperties)
+				foreach (var mprop in sensor.MeasureProperties)
 					MeasureProperties.Add(new MeasurePropertyDto(mprop));
 			}
 
-			if (device.HasAlert)
+			if (sensor.HasAlert)
 			{
-				HasAlert = device.HasAlert;
-				AlertMinLevel = device.AlertMinRatio * 100;
-				AlertMaxLevel = device.AlertMaxRatio * 100;
-				AlertOn = device.AlertOn;
+				HasAlert = sensor.HasAlert;
+				AlertMinLevel = sensor.AlertMinRatio * 100;
+				AlertMaxLevel = sensor.AlertMaxRatio * 100;
+				AlertOn = sensor.AlertOn;
 			}
 		}
 	}

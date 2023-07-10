@@ -2,10 +2,10 @@
 
 namespace Sensorize.Domain.Models
 {
-	public class DeviceState : BaseModel
+	public class SensorState : BaseModel
 	{
-		public int DeviceStateId { get; set; }
-		public int DeviceId { get; set; }
+		public int SensorStateId { get; set; }
+		public int SensorId { get; set; }
 		public double? Measurement { get; set; }
 		public string? Description { get; set; }
 		public bool IsNotified { get; set; }
@@ -15,6 +15,6 @@ namespace Sensorize.Domain.Models
 		public DateTime? NextStateNotification { get; set; }
 
 
-        public virtual Device? Device { get; set; }
+        public virtual Sensor? Sensor { get; set; }
 	}
 }

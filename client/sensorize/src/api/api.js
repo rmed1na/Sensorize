@@ -1,8 +1,8 @@
 const api = import.meta.env.VITE_API_BASE_URL;
 const resources = {
-    device: {
+    sensor: {
         getAll: async function () {
-            const response = await fetch(`${api}/device`)
+            const response = await fetch(`${api}/sensor`)
 
             if (response.ok) {
                 const data = await response.json();
@@ -11,24 +11,24 @@ const resources = {
                 throwError(response);
             }
         },
-        create: async function (device, successCallback = null, errorCallback = null) {
-            const response = await fetch(`${api}/device`, {
+        create: async function (sensor, successCallback = null, errorCallback = null) {
+            const response = await fetch(`${api}/sensor`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    name: device.name,
-                    topic: device.topic,
-                    measureTypeCode: device.measureTypeCode,
-                    measureProperties: device.measureProperties,
-                    channel: device.channel,
-                    hasAlert: device.hasAlert,
-                    alertMinLevel: device.alertMinLevel,
-                    alertMaxLevel: device.alertMaxLevel,
-                    alertOn: device.alertOn,
-                    notificationGroupId: device.notificationGroupId,
-                    stateNotificationFrequency: device.stateNotificationFrequency
+                    name: sensor.name,
+                    topic: sensor.topic,
+                    measureTypeCode: sensor.measureTypeCode,
+                    measureProperties: sensor.measureProperties,
+                    channel: sensor.channel,
+                    hasAlert: sensor.hasAlert,
+                    alertMinLevel: sensor.alertMinLevel,
+                    alertMaxLevel: sensor.alertMaxLevel,
+                    alertOn: sensor.alertOn,
+                    notificationGroupId: sensor.notificationGroupId,
+                    stateNotificationFrequency: sensor.stateNotificationFrequency
                 })
             });
         
@@ -49,24 +49,24 @@ const resources = {
                 throwError(response);
             }
         },
-        update: async function (device, callBack = null) {
-            const response = await fetch(`${api}/device/${device.deviceId}`, {
+        update: async function (sensor, callBack = null) {
+            const response = await fetch(`${api}/sensor/${sensor.sensorId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    name: device.name,
-                    topic: device.topic,
-                    channel: device.channel,
-                    measureTypeCode: device.measureTypeCode,
-                    measureProperties: device.measureProperties,
-                    hasAlert: device.hasAlert,
-                    alertMinLevel: device.alertMinLevel,
-                    alertMaxLevel: device.alertMaxLevel,
-                    alertOn: device.alertOn,
-                    notificationGroupId: device.notificationGroupId,
-                    stateNotificationFrequency: device.stateNotificationFrequency
+                    name: sensor.name,
+                    topic: sensor.topic,
+                    channel: sensor.channel,
+                    measureTypeCode: sensor.measureTypeCode,
+                    measureProperties: sensor.measureProperties,
+                    hasAlert: sensor.hasAlert,
+                    alertMinLevel: sensor.alertMinLevel,
+                    alertMaxLevel: sensor.alertMaxLevel,
+                    alertOn: sensor.alertOn,
+                    notificationGroupId: sensor.notificationGroupId,
+                    stateNotificationFrequency: sensor.stateNotificationFrequency
                 })
             });
 
@@ -252,9 +252,9 @@ const resources = {
     }
 }
 
-// DEVICES
-async function getDevices() {
-    const response = await fetch(`${api}/device`)
+// Sensors
+async function getSensors() {
+    const response = await fetch(`${api}/sensor`)
 
     if (response.ok) {
         const data = await response.json();
@@ -265,7 +265,7 @@ async function getDevices() {
 }
 
 function getStatusEventSource() {
-    return new EventSource(`${api}/device/states`);
+    return new EventSource(`${api}/sensor/states`);
 }
 
 function throwError(response) {
@@ -273,7 +273,7 @@ function throwError(response) {
 }
 
 export default {
-    getDevices,
+    getSensors,
     getStatusEventSource,
     resources
 }

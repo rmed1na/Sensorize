@@ -8,30 +8,45 @@ import {
     Heading,
     Text,
     Divider,
-    SimpleGrid
+    SimpleGrid,
+    TableContainer,
+    Table,
+    Thead,
+    Tr,
+    Td,
+    Th,
+    Tbody,
+    Accordion,
+    AccordionItem,
+    AccordionButton,
+    AccordionIcon,
+    AccordionPanel,
+    Card,
+    CardBody,
+    CardHeader
 } from "@chakra-ui/react";
 // Icons
 import { BiChip } from 'react-icons/bi';
 import { CgDanger } from 'react-icons/cg';
 import { MdOutlineSync } from 'react-icons/md';
 // CC
-import DeviceStateCard from '../device/DeviceStateCard';
+import SensorStateCard from '../sensor/SensorStateCard';
 import api from '../../api/api';
 import dateUtil from '../../utils/dateUtil';
 
 export default function Dashboard() {
     const [lastUpdateDate, setLastUpdateDate] = useState('-');
-    const [devices, setDevices] = useState([]);
-    const [deviceStates, setDeviceStates] = useState([]);
-    const deviceStatesRef = useRef(deviceStates);
+    const [sensors, setSensors] = useState([]);
+    const [sensorStates, setSensorStates] = useState([]);
+    const sensorStatesRef = useRef(sensorStates);
 
-    async function loadDevices() {
-        const devices = await api.getDevices();
-        setDevices(devices);
+    async function loadSensors() {
+        const sensors = await api.getSensors();
+        setSensors(sensors);
     }
 
     useEffect(() => {
-        loadDevices();
+        loadSensors();
 
         const eventSource = api.getStatusEventSource();
         
@@ -41,12 +56,12 @@ export default function Dashboard() {
                 lastUpdate: new Date().toLocaleDateString()
             };
             
-            let updatedDeviceStates = deviceStatesRef.current
-                .filter(x => x.device.deviceId !== data.device.deviceId)
+            let updatedSensorStates = sensorStatesRef.current
+                .filter(x => x.sensor.sensorId !== data.sensor.sensorId)
                 .concat(data);
 
-            deviceStatesRef.current = updatedDeviceStates;
-            setDeviceStates(updatedDeviceStates);
+            sensorStatesRef.current = updatedSensorStates;
+            setSensorStates(updatedSensorStates);
         }
 
         return () => {
@@ -57,7 +72,7 @@ export default function Dashboard() {
     useEffect(() => {
         let date = new Date();
         setLastUpdateDate(dateUtil.toReadableString(date));
-    }, [deviceStates]);
+    }, [sensorStates]);
 
     return (
         <>
@@ -66,15 +81,15 @@ export default function Dashboard() {
                     <Flex gap={2} align="center">
                         <Icon as={BiChip} boxSize={8} />
                         <Box>
-                            <Heading>{devices?.length}</Heading>
-                            <Text>Dispositivos</Text>
+                            <Heading>{sensors?.length}</Heading>
+                            <Text>Sensores</Text>
                         </Box>
                     </Flex>
                     <Box w="1px" bg="brand.100" mx="2" />
                     <Flex gap={2} align="center">
                         <Icon as={CgDanger} boxSize={8} />
                         <Box>
-                            <Heading>{deviceStates?.filter(ds => ds.isOnAlert == true).length}</Heading>
+                            <Heading>{sensorStates?.filter(ds => ds.isOnAlert == true).length}</Heading>
                             <Text>Alertas</Text>
                         </Box>
                     </Flex>
@@ -91,16 +106,40 @@ export default function Dashboard() {
                 <Divider my={5} borderColor="brand.100" />
 
                 <SimpleGrid columns={5} spacing={2}>
-                    {devices && devices.map(d => {
-                        let status = deviceStates.find(s => s.device.deviceId == d.deviceId);
-                        return <DeviceStateCard 
-                                    key={d.deviceId} 
+                    {sensors && sensors.map(d => {
+                        let status = sensorStates.find(s => s.sensor.sensorId == d.sensorId);
+                        return <SensorStateCard 
+                                    key={d.sensorId} 
                                     name={d.name}
                                     lastUpdate={status?.timeSpanDescription}
                                     isOnAlert={status?.isOnAlert}
                                     stateDescription={status?.description} />
                     })}
                 </SimpleGrid>
+
+                {/* <Card bg='blackAlpha.50'>
+                    <CardHeader pb={0} pt={4} px={4}>
+                        <Text fontSize='0.875rem' fontWeight={600}>Device name</Text>
+                    </CardHeader>
+                    <CardBody px={4} pt={2} pb={2}>
+                        <Accordion allowMultiple>
+                            <AccordionItem borderColor='blackAlpha.100' border='none'>
+                                <AccordionButton>
+                                    <Text flex='1' textAlign='left' fontSize='0.875rem'>Sensor 1</Text>
+                                    <AccordionIcon />
+                                </AccordionButton>
+                                <AccordionPanel>Lorem ipsum</AccordionPanel>
+                            </AccordionItem>
+                            <AccordionItem borderColor='blackAlpha.100' border='none'>
+                                <AccordionButton>
+                                    <Text flex='1' textAlign='left' fontSize='0.875rem'>Sensor 2</Text>
+                                    <AccordionIcon />
+                                </AccordionButton>
+                                <AccordionPanel>Lorem ipsum</AccordionPanel>
+                            </AccordionItem>
+                        </Accordion>
+                    </CardBody>
+                </Card> */}
             </Box>
         </>
     )

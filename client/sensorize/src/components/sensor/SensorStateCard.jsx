@@ -8,7 +8,7 @@ import {
     Flex
 } from '@chakra-ui/react';
 
-export default function DeviceStateCard({
+export default function SensorStateCard({
     name,
     lastUpdate,
     isOnAlert,

@@ -11,11 +11,11 @@ import {
 } from "@chakra-ui/react";
 
 export default function MessageBroker({
-    device,
-    setDevice
+    sensor,
+    setSensor
 }) {
-    const handleTopicChange = (e) => setDevice({ ...device, topic: e.target.value });
-    const handleChannelChange = (e) => setDevice({ ...device, channel: e.target.value });
+    const handleTopicChange = (e) => setSensor({ ...sensor, topic: e.target.value });
+    const handleChannelChange = (e) => setSensor({ ...sensor, channel: e.target.value });
 
     return (
         <>
@@ -34,7 +34,7 @@ export default function MessageBroker({
                                 placeholder="Tópico de comunicación en MQTT"
                                 type="text"
                                 onChange={e => handleTopicChange(e)}
-                                value={device ? device?.topic : ''} />
+                                value={sensor ? sensor?.topic : ''} />
                         </FormControl>
                         <FormControl py={2}>
                             <FormLabel>Canal</FormLabel>
@@ -42,7 +42,7 @@ export default function MessageBroker({
                                 placeholder="Canal para lectura del dato"
                                 type="text"
                                 onChange={e => handleChannelChange(e)}
-                                value={device ? device?.channel : ''} />
+                                value={sensor ? sensor?.channel : ''} />
                         </FormControl>
                     </AccordionPanel>
                 </AccordionItem>
